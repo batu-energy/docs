@@ -1,8 +1,8 @@
 {
   "openapi": "3.0.1",
   "info": {
-    "title": "OpenAPI Plant Store",
-    "description": "A sample API that uses a plant store as an example to demonstrate features in the OpenAPI specification",
+    "title": "Batu metrics API",
+    "description": "Batu metrics API specification",
     "license": {
       "name": "MIT"
     },
@@ -10,7 +10,10 @@
   },
   "servers": [
     {
-      "url": "http://sandbox.mintlify.com"
+      "url": "http://sandbox.batuenergy.com/api/v1"
+    },
+    {
+      "url": "http://production.batuenergy.com/api/v1"
     }
   ],
   "security": [
@@ -19,76 +22,61 @@
     }
   ],
   "paths": {
-    "/plants": {
+    "/assets": {
       "get": {
-        "description": "Returns all plants from the system that the user has access to",
+        "description": "Given the filters, returns all assets the organization has access to",
         "parameters": [
           {
-            "name": "limit",
+            "name": "type",
             "in": "query",
-            "description": "The maximum number of results to return",
+            "required": false,
+            "description": "The type of assets to return",
             "schema": {
-              "type": "integer",
-              "format": "int32"
+              "type": "string",
+              "enum": ["METER", "EV", "SOLAR", "BATTERY"]
+            }
+          },
+          {
+            "name": "make",
+            "in": "query",
+            "required": false,
+            "description": "The ids of make of assets to return",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "uuid"
+              }
             }
           }
         ],
         "responses": {
-          "200": {
-            "description": "Plant response",
+          "2XX": {
+            "description": "Get assets response",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Plant"
-                  }
+                  "$ref": "#/components/schemas/SuccessGetAssets"
                 }
               }
             }
           },
-          "400": {
+          "4XX": {
+            "description": "Failed request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseFail"
+                }
+              }
+            }
+          },
+          "5XX": {
             "description": "Unexpected error",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          }
-        }
-      },
-      "post": {
-        "description": "Creates a new plant in the store",
-        "requestBody": {
-          "description": "Plant to add to the store",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/NewPlant"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "plant response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Plant"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "unexpected error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
+                  "$ref": "#/components/schemas/ResponseError"
                 }
               }
             }
@@ -96,32 +84,665 @@
         }
       }
     },
-    "/plants/{id}": {
+    "/asset/{id}": {
       "delete": {
-        "description": "Deletes a single plant based on the ID supplied",
+        "description": "Given the asset id deletes the associated asset",
         "parameters": [
           {
             "name": "id",
             "in": "path",
-            "description": "ID of plant to delete",
+            "description": "ID of asset to delete",
             "required": true,
             "schema": {
-              "type": "integer",
-              "format": "int64"
+              "type": "string",
+              "format": "uuid"
             }
           }
         ],
         "responses": {
-          "204": {
-            "description": "Plant deleted",
-            "content": {}
-          },
-          "400": {
-            "description": "unexpected error",
+          "2XX": {
+            "description": "Asset response",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error"
+                  "$ref": "#/components/schemas/SuccessDeleteAsset"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "description": "Failed request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseFail"
+                }
+              }
+            }
+          },
+          "5XX": {
+            "description": "Unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "description": "Given the asset id returns the asssociated asset",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID of asset to return",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "2XX": {
+            "description": "Asset response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessGetAsset"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "description": "Failed request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseFail"
+                }
+              }
+            }
+          },
+          "5XX": {
+            "description": "Unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/asset": {
+      "post": {
+        "description": "Creates a new asset",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RequestPostAsset"
+              }
+            }
+          }
+        },
+        "responses": {
+          "2XX": {
+            "description": "Asset response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessPostAsset"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "description": "Failed request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseFail"
+                }
+              }
+            }
+          },
+          "5XX": {
+            "description": "Unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "description": "Updates an asset",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RequestPutAsset"
+              }
+            }
+          }
+        },
+        "responses": {
+          "2XX": {
+            "description": "Asset response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessPutAsset"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "description": "Failed request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseFail"
+                }
+              }
+            }
+          },
+          "5XX": {
+            "description": "Unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/makes": {
+      "get": {
+        "description": "Given the filters, returns all makes the organization has access to",
+        "parameters": [
+          {
+            "name": "type",
+            "in": "query",
+            "required": false,
+            "description": "The type of assets to return",
+            "schema": {
+              "type": "string",
+              "enum": ["METER", "EV", "SOLAR", "BATTERY"]
+            }
+          },
+          {
+            "name": "make",
+            "in": "query",
+            "required": false,
+            "description": "The id of make of assets to return",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "2XX": {
+            "description": "Get makes response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessGetMakes"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "description": "Failed request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseFail"
+                }
+              }
+            }
+          },
+          "5XX": {
+            "description": "Unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/make/{id}": {
+      "delete": {
+        "description": "Given the make id deletes the associated make",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID of make to delete",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "2XX": {
+            "description": "Make response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessDeleteMake"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "description": "Failed request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseFail"
+                }
+              }
+            }
+          },
+          "5XX": {
+            "description": "Unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "description": "Given the make id returns the asssociated make",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Id of make to return",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "2XX": {
+            "description": "Make response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessGetMake"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "description": "Failed request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseFail"
+                }
+              }
+            }
+          },
+          "5XX": {
+            "description": "Unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/make": {
+      "post": {
+        "description": "Creates a new make",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RequestPostMake"
+              }
+            }
+          }
+        },
+        "responses": {
+          "2XX": {
+            "description": "Make response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessPostMake"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "description": "Failed request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseFail"
+                }
+              }
+            }
+          },
+          "5XX": {
+            "description": "Unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "description": "Updates a make",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RequestPutMake"
+              }
+            }
+          }
+        },
+        "responses": {
+          "2XX": {
+            "description": "Make response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessPutMake"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "description": "Failed request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseFail"
+                }
+              }
+            }
+          },
+          "5XX": {
+            "description": "Unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/schema/{id}": {
+      "delete": {
+        "description": "Given the schema id deletes the associated schema",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Id of schema to delete",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "2XX": {
+            "description": "Make response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessDeleteSchema"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "description": "Failed request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseFail"
+                }
+              }
+            }
+          },
+          "5XX": {
+            "description": "Unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "description": "Given the schema id returns the asssociated schema",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Id of schema to return",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "2XX": {
+            "description": "Schema response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessGetSchema"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "description": "Failed request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseFail"
+                }
+              }
+            }
+          },
+          "5XX": {
+            "description": "Unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/schema/{assetId}": {
+      "get": {
+        "description": "Given the asset id returns the asssociated schema",
+        "parameters": [
+          {
+            "name": "assetId",
+            "in": "path",
+            "description": "Id of asset related to schema",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "2XX": {
+            "description": "Schema response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessGetSchema"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "description": "Failed request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseFail"
+                }
+              }
+            }
+          },
+          "5XX": {
+            "description": "Unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/schema": {
+      "post": {
+        "description": "Creates a new schema",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RequestPostSchema"
+              }
+            }
+          }
+        },
+        "responses": {
+          "2XX": {
+            "description": "Schema response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessPostSchema"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "description": "Failed request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseFail"
+                }
+              }
+            }
+          },
+          "5XX": {
+            "description": "Unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "description": "Updates a schema",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RequestPutSchema"
+              }
+            }
+          }
+        },
+        "responses": {
+          "2XX": {
+            "description": "Schema response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessPutSchema"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "description": "Failed request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseFail"
+                }
+              }
+            }
+          },
+          "5XX": {
+            "description": "Unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseError"
                 }
               }
             }
@@ -132,55 +753,787 @@
   },
   "components": {
     "schemas": {
-      "Plant": {
-        "required": [
-          "name"
-        ],
+      "SuccessGetAssets": {
         "type": "object",
         "properties": {
+          "status": {
+            "type": "string",
+            "example": "success",
+            "description": "Indicates the request was successful"
+          },
+          "data": {
+            "type": "object",
+            "description": "The data associated with the response",
+            "properties": {
+              "assets": {
+                "description": "The returned assets",
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/ResponseAsset"
+                }
+              }
+            }
+          }
+        }
+      },
+      "SuccessGetAsset": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "example": "success",
+            "description": "Indicates the request was successful"
+          },
+          "data": {
+            "type": "object",
+            "description": "The data associated with the response",
+            "properties": {
+              "asset": {
+                "description": "The returned asset",
+                "$ref": "#/components/schemas/ResponseAsset"
+              }
+            }
+          }
+        }
+      },
+      "SuccessDeleteAsset": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "example": "success",
+            "description": "Indicates the request was successful"
+          },
+          "data": {
+            "type": "object",
+            "description": "The data associated with the response",
+            "properties": {
+              "message": {
+                "description": "Message indicating the succesful deletion of the asset",
+                "example": "Asset deleted successfully",
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "SuccessPostAsset": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "example": "success",
+            "description": "Indicates the request was successful"
+          },
+          "data": {
+            "type": "object",
+            "description": "The data associated with the response",
+            "properties": {
+              "asset": {
+                "description": "The created asset",
+                "$ref": "#/components/schemas/ResponseAsset"
+              }
+            }
+          }
+        }
+      },
+      "SuccessPutAsset": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "example": "success",
+            "description": "Indicates the request was successful"
+          },
+          "data": {
+            "type": "object",
+            "description": "The data associated with the response",
+            "properties": {
+              "asset": {
+                "description": "The updated asset",
+                "$ref": "#/components/schemas/ResponseAsset"
+              }
+            }
+          }
+        }
+      },
+      "RequestPostAsset": {
+        "type": "object",
+        "required": ["name", "make", "schema"],
+        "properties": {
           "name": {
-            "description": "The name of the plant",
+            "description": "The name of the asset",
             "type": "string"
           },
-          "tag": {
-            "description": "Tag to specify the type",
+          "make": {
+            "description": "The id of make of the asset",
+            "type": "string",
+            "example": "<uuid>",
+            "format": "uuid"
+          },
+          "schema": {
+            "description": "The id of schema of the asset",
+            "type": "string",
+            "example": "<uuid>",
+            "format": "uuid"
+          },
+          "metadata": {
+            "description": "The metadata associated with the asset",
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "RequestPutAsset": {
+        "type": "object",
+        "required": ["name", "make", "schema", "id"],
+        "properties": {
+          "id": {
+            "description": "The id of the asset",
+            "type": "string",
+            "example": "<uuid>",
+            "format": "uuid"
+          },
+          "name": {
+            "description": "The name of the asset",
+            "type": "string"
+          },
+          "make": {
+            "description": "The id of make of the asset",
+            "type": "string",
+            "example": "<uuid>",
+            "format": "uuid"
+          },
+          "schema": {
+            "description": "The id of schema of the asset",
+            "type": "string",
+            "example": "<uuid>",
+            "format": "uuid"
+          },
+          "metadata": {
+            "description": "The metadata associated with the asset",
             "type": "string"
           }
         }
       },
-      "NewPlant": {
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/Plant"
+      "ResponseAsset": {
+        "type": "object",
+        "required": [
+          "id",
+          "created_at",
+          "updated_at",
+          "name",
+          "make",
+          "schema",
+          "metadata"
+        ],
+        "properties": {
+          "id": {
+            "description": "the id of the asset",
+            "type": "string",
+            "example": "<uuid>",
+            "format": "uuid"
           },
-          {
-            "required": [
-              "id"
-            ],
+          "created_at": {
+            "description": "the time the asset was created",
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "description": "the time the asset was updated",
+            "type": "string",
+            "format": "date-time"
+          },
+          "name": {
+            "description": "The name of the asset",
+            "type": "string"
+          },
+          "make": {
+            "description": "The id of make of the asset",
+            "type": "string",
+            "example": "<uuid>",
+            "format": "uuid"
+          },
+          "schema": {
+            "description": "The id of schema of the asset",
+            "type": "string",
+            "example": "<uuid>",
+            "format": "uuid"
+          },
+          "metadata": {
+            "description": "The metadata associated with the asset",
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "SuccessGetMakes": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "example": "success",
+            "description": "Indicates the request was successful"
+          },
+          "data": {
             "type": "object",
+            "description": "The data associated with the response",
             "properties": {
-              "id": {
-                "description": "Identification number of the plant",
-                "type": "integer",
-                "format": "int64"
+              "assets": {
+                "description": "The returned makes",
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/ResponseMake"
+                }
               }
             }
           }
-        ]
+        }
       },
-      "Error": {
-        "required": [
-          "error",
-          "message"
-        ],
+      "SuccessGetMake": {
         "type": "object",
         "properties": {
-          "error": {
-            "type": "integer",
-            "format": "int32"
+          "status": {
+            "type": "string",
+            "example": "success",
+            "description": "Indicates the request was successful"
+          },
+          "data": {
+            "type": "object",
+            "description": "The data associated with the response",
+            "properties": {
+              "asset": {
+                "description": "The returned make",
+                "$ref": "#/components/schemas/ResponseMake"
+              }
+            }
+          }
+        }
+      },
+      "SuccessDeleteMake": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "example": "success",
+            "description": "Indicates the request was successful"
+          },
+          "data": {
+            "type": "object",
+            "description": "The data associated with the response",
+            "properties": {
+              "message": {
+                "description": "Message indicating the succesful deletion of the make",
+                "example": "Make deleted successfully",
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "SuccessPostMake": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "example": "success",
+            "description": "Indicates the request was successful"
+          },
+          "data": {
+            "type": "object",
+            "description": "The data associated with the response",
+            "properties": {
+              "asset": {
+                "description": "The created make",
+                "$ref": "#/components/schemas/ResponseMake"
+              }
+            }
+          }
+        }
+      },
+      "SuccessPutMake": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "example": "success",
+            "description": "Indicates the request was successful"
+          },
+          "data": {
+            "type": "object",
+            "description": "The data associated with the response",
+            "properties": {
+              "asset": {
+                "description": "The updated make",
+                "$ref": "#/components/schemas/ResponseMake"
+              }
+            }
+          }
+        }
+      },
+      "RequestPostMake": {
+        "type": "object",
+        "required": ["name", "type", "brand", "model"],
+        "properties": {
+          "name": {
+            "description": "The name of the make",
+            "type": "string"
+          },
+          "type": {
+            "description": "The type of device the make refers to",
+            "type": "string",
+            "enum": ["METER", "EV", "SOLAR", "BATTERY"]
+          },
+          "brand": {
+            "description": "The brand of the make",
+            "type": "string",
+            "example": "<uuid>",
+            "format": "uuid"
+          },
+          "model": {
+            "description": "The model of the make",
+            "type": "string"
+          },
+          "metadata": {
+            "description": "The metadata associated with the make",
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "RequestPutMake": {
+        "type": "object",
+        "required": ["id", "name", "type", "brand", "model"],
+        "properties": {
+          "id": {
+            "description": "The id of the asset",
+            "type": "string",
+            "example": "<uuid>",
+            "format": "uuid"
+          },
+          "name": {
+            "description": "The name of the make",
+            "type": "string"
+          },
+          "type": {
+            "description": "The type of device the make refers to",
+            "type": "string",
+            "enum": ["METER", "EV", "SOLAR", "BATTERY"]
+          },
+          "brand": {
+            "description": "The brand of the make",
+            "type": "string",
+            "example": "<uuid>",
+            "format": "uuid"
+          },
+          "model": {
+            "description": "The model of the make",
+            "type": "string"
+          },
+          "metadata": {
+            "description": "The metadata associated with the make",
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "ResponseMake": {
+        "type": "object",
+        "required": [
+          "id",
+          "created_at",
+          "updated_at",
+          "name",
+          "type",
+          "brand",
+          "model",
+          "metadata"
+        ],
+        "properties": {
+          "id": {
+            "description": "the id of the make",
+            "type": "string",
+            "example": "<uuid>",
+            "format": "uuid"
+          },
+          "created_at": {
+            "description": "the time the make was created",
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "description": "the time the make was updated",
+            "type": "string",
+            "format": "date-time"
+          },
+          "name": {
+            "description": "The name of the make",
+            "type": "string"
+          },
+          "type": {
+            "description": "The type of device the make refers to",
+            "type": "string",
+            "enum": ["METER", "EV", "SOLAR", "BATTERY"]
+          },
+          "brand": {
+            "description": "The brand of the make",
+            "type": "string"
+          },
+          "model": {
+            "description": "The model of the make",
+            "type": "string"
+          },
+          "metadata": {
+            "description": "The metadata associated with the make",
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "SuccessGetSchema": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "example": "success",
+            "description": "Indicates the request was successful"
+          },
+          "data": {
+            "type": "object",
+            "description": "The data associated with the response",
+            "properties": {
+              "asset": {
+                "description": "The returned schema",
+                "$ref": "#/components/schemas/ResponseSchema"
+              }
+            }
+          }
+        }
+      },
+      "SuccessDeleteSchema": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "example": "success",
+            "description": "Indicates the request was successful"
+          },
+          "data": {
+            "type": "object",
+            "description": "The data associated with the response",
+            "properties": {
+              "message": {
+                "description": "Message indicating the succesful deletion of the schema",
+                "example": "Schema deleted successfully",
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "SuccessPostSchema": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "example": "success",
+            "description": "Indicates the request was successful"
+          },
+          "data": {
+            "type": "object",
+            "description": "The data associated with the response",
+            "properties": {
+              "asset": {
+                "description": "The created schema",
+                "$ref": "#/components/schemas/ResponseSchema"
+              }
+            }
+          }
+        }
+      },
+      "SuccessPutSchema": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "example": "success",
+            "description": "Indicates the request was successful"
+          },
+          "data": {
+            "type": "object",
+            "description": "The data associated with the response",
+            "properties": {
+              "asset": {
+                "description": "The updated schema",
+                "$ref": "#/components/schemas/ResponseSchema"
+              }
+            }
+          }
+        }
+      },
+      "RequestPostSchema": {
+        "type": "object",
+        "properties": {
+          "metrics": {
+            "description": "The id(s) of the metrics associated with the schema",
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid",
+              "example": "<uuid>"
+            }
+          },
+          "metadata": {
+            "description": "The metadata associated with the make",
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "RequestPutSchema": {
+        "type": "object",
+        "required": ["id"],
+        "properties": {
+          "id": {
+            "description": "The id of the asset",
+            "type": "string",
+            "example": "<uuid>",
+            "format": "uuid"
+          },
+          "metrics": {
+            "description": "The id(s) of the metrics associated with the schema",
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid",
+              "example": "<uuid>"
+            }
+          },
+          "metadata": {
+            "description": "The metadata associated with the make",
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "ResponseSchema": {
+        "type": "object",
+        "required": ["id", "created_at", "updated_at", "metrics", "metadata"],
+        "properties": {
+          "id": {
+            "description": "the id of the schema",
+            "type": "string",
+            "example": "<uuid>",
+            "format": "uuid"
+          },
+          "created_at": {
+            "description": "the time the schema was created",
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "description": "the time the schema was updated",
+            "type": "string",
+            "format": "date-time"
+          },
+          "metrics": {
+            "description": "The id(s) of the metrics associated with the schema",
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid",
+              "example": "<uuid>"
+            }
+          },
+          "metadata": {
+            "description": "The metadata associated with the make",
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "SuccessGetMetric": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "example": "success",
+            "description": "Indicates the request was successful"
+          },
+          "data": {
+            "type": "object",
+            "description": "The data associated with the response",
+            "properties": {
+              "asset": {
+                "description": "The returned metric",
+                "$ref": "#/components/schemas/ResponseMetric"
+              }
+            }
+          }
+        }
+      },
+      "SuccessDeleteMetric": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "example": "success",
+            "description": "Indicates the request was successful"
+          },
+          "data": {
+            "type": "object",
+            "description": "The data associated with the response",
+            "properties": {
+              "message": {
+                "description": "Message indicating the succesful deletion of the metric",
+                "example": "Metric deleted successfully",
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "SuccessPostMetric": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "example": "success",
+            "description": "Indicates the request was successful"
+          },
+          "data": {
+            "type": "object",
+            "description": "The data associated with the response",
+            "properties": {
+              "asset": {
+                "description": "The created metric",
+                "$ref": "#/components/schemas/ResponseMetric"
+              }
+            }
+          }
+        }
+      },
+      "SuccessPutMetric": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "example": "success",
+            "description": "Indicates the request was successful"
+          },
+          "data": {
+            "type": "object",
+            "description": "The data associated with the response",
+            "properties": {
+              "asset": {
+                "description": "The updated metric",
+                "$ref": "#/components/schemas/ResponseMetric"
+              }
+            }
+          }
+        }
+      },
+      "RequestPostMetric": {
+        "type": "object",
+        "required": [
+          "name",
+          "processId",
+          "variable",
+          "units",
+          "timeGranularity",
+          "type",
+          "metadata"
+        ],
+        "properties": {
+          "process": {
+            "description": "The process associated with the metric",
+            "type": "object",
+            "properties": {
+              "type": {
+                "description": "The name of the process",
+                "type": "string"
+              },
+              "description": {
+                "description": "The description of the process",
+                "type": "string"
+              }
+            },
+            "items": {
+              "type": "string",
+              "format": "uuid",
+              "example": "<uuid>"
+            }
+          },
+          "metadata": {
+            "description": "The metadata associated with the metric",
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "RequestPutMetric": {
+        "type": "object",
+        "required": ["id"],
+        "properties": {
+          "id": {
+            "description": "The id of the asset",
+            "type": "string",
+            "example": "<uuid>",
+            "format": "uuid"
+          },
+          "metrics": {
+            "description": "The id(s) of the metrics associated with the schema",
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid",
+              "example": "<uuid>"
+            }
+          },
+          "metadata": {
+            "description": "The metadata associated with the make",
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "ResponseFail": {
+        "required": ["status", "data"],
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "example": "fail"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "[parameter]": {
+                "type": "string",
+                "example": "Message describing the invalid parameter or value associated with the request",
+                "description": "Message describing the invalid parameter or value associated with the request"
+              }
+            }
+          }
+        }
+      },
+      "ResponseError": {
+        "required": ["status", "message"],
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "example": "error"
           },
           "message": {
-            "type": "string"
+            "type": "string",
+            "example": "Message describing the error from the server",
+            "description": "Message describing the error from the server"
+          },
+          "code": {
+            "type": "integer",
+            "format": "int32",
+            "description": "The error code from the server"
           }
         }
       }
