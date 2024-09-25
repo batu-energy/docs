@@ -14,7 +14,7 @@ This reference is your key to a comprehensive understanding of the Batu Metrics 
 
 ### **Conventions**
 
-The base URL to send all API requests is `https://production.batuenergy.com` and `https://api-sandbox.batuenergy.com`. HTTPS is required for all API requests.
+The base URL to send all API requests is `https://production.batuenergy.com` and `https://sandbox.batuenergy.com`. HTTPS is required for all API requests.
 
 The Batu API follows RESTful conventions when possible, with most operations performed via `GET`, `POST`, `PUT`, and `DELETE` requests on page and database resources. Request and response bodies are encoded as JSON.
 
@@ -160,19 +160,18 @@ Refers to the manufacturer and model of the asset. This defines the abstraction 
 
 These fields are shared by all makes. Fields marked with \* are always present.
 
-| **Property**                             | **Type**              | **Description**                                                                                | **Example value**                         |
-| ---------------------------------------- | --------------------- | ---------------------------------------------------------------------------------------------- | ----------------------------------------- |
-| `object`\*                               | `object: make`        | Always "make"                                                                                  | `"make"`                                  |
-| `id`\*                                   | `string`(UUID)        | Unique identifier for this make.                                                               | `"ba3eb8ca-be65-44d1-8997-762c1993add9"`  |
-| `type`\*                                 | `string`(Enum)        | Type of the asset. Possible values are : `"METER"` , `"SOLAR INVERTER"` , `"BATTERY"` , `"EV"` | `"METER"`                                 |
-| `createdAt`\*                            | `datetime`            | datetime of creation                                                                           | `2024-08-12T02:12:33.231Z`                |
-| `updatedAt`\*                            | `datetime`            | datetime of update                                                                             | `2024-08-12T03:12:33.231Z`                |
-| `brand`\*                                | `string`              | Make’s brand                                                                                   | `"ACME inc."`                             |
-| `model`\*                                | `string`              | Make’s model                                                                                   | `"smart meter A012345"`                   |
-| `version`\*                              | `string`              | Make’s version                                                                                 | `"1.1.1"`                                 |
-| `integrations` \*                        | `array:string` (UUID) | Make’s associated integrations                                                                 | `["6dffa5c7-1e08-4dce-86bd-a203406a89f6", |
-| "7255dfaf-3000-4004-bbc7-4aa50eba6406"]` |
-| `metadata`\*                             | `string`              | Make’s metadata"                                                                               | `"{'key':'value', ...,}"`                 |
+| **Property**      | **Type**              | **Description**                                                                                | **Example value**                                                                  |
+| ----------------- | --------------------- | ---------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| `object`\*        | `object: make`        | Always "make"                                                                                  | `"make"`                                                                           |
+| `id`\*            | `string`(UUID)        | Unique identifier for this make.                                                               | `"ba3eb8ca-be65-44d1-8997-762c1993add9"`                                           |
+| `type`\*          | `string`(Enum)        | Type of the asset. Possible values are : `"METER"` , `"SOLAR INVERTER"` , `"BATTERY"` , `"EV"` | `"METER"`                                                                          |
+| `createdAt`\*     | `datetime`            | datetime of creation                                                                           | `2024-08-12T02:12:33.231Z`                                                         |
+| `updatedAt`\*     | `datetime`            | datetime of update                                                                             | `2024-08-12T03:12:33.231Z`                                                         |
+| `brand`\*         | `string`              | Make’s brand                                                                                   | `"ACME inc."`                                                                      |
+| `model`\*         | `string`              | Make’s model                                                                                   | `"smart meter A012345"`                                                            |
+| `version`\*       | `string`              | Make’s version                                                                                 | `"1.1.1"`                                                                          |
+| `integrations` \* | `array:string` (UUID) | Make’s associated integrations                                                                 | `["6dffa5c7-1e08-4dce-86bd-a203406a89f6", "7255dfaf-3000-4004-bbc7-4aa50eba6406"]` |
+| `metadata`\*      | `string`              | Make’s metadata"                                                                               | `"{'key':'value', ...,}"`                                                          |
 
 ### Example
 
