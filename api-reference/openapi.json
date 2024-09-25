@@ -22,68 +22,6 @@
     }
   ],
   "paths": {
-    "/assets": {
-      "get": {
-        "description": "Given the filters, returns all assets the organization has access to",
-        "parameters": [
-          {
-            "name": "type",
-            "in": "query",
-            "required": false,
-            "description": "The type of assets to return",
-            "schema": {
-              "type": "string",
-              "enum": ["METER", "EV", "SOLAR", "BATTERY"]
-            }
-          },
-          {
-            "name": "make",
-            "in": "query",
-            "required": false,
-            "description": "The ids of make of assets to return",
-            "schema": {
-              "type": "array",
-              "items": {
-                "type": "string",
-                "format": "uuid"
-              }
-            }
-          }
-        ],
-        "responses": {
-          "2XX": {
-            "description": "Get assets response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/SuccessGetAssets"
-                }
-              }
-            }
-          },
-          "4XX": {
-            "description": "Failed request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ResponseFail"
-                }
-              }
-            }
-          },
-          "5XX": {
-            "description": "Unexpected error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ResponseError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/asset/{id}": {
       "delete": {
         "description": "Given the asset id deletes the associated asset",
@@ -336,7 +274,7 @@
           {
             "name": "id",
             "in": "path",
-            "description": "ID of make to delete",
+            "description": "Id of make to delete",
             "required": true,
             "schema": {
               "type": "string",
@@ -515,14 +453,14 @@
         }
       }
     },
-    "/schema/{id}": {
+    "/integration/{id}": {
       "delete": {
-        "description": "Given the schema id deletes the associated schema",
+        "description": "Given the integration id deletes the associated integration",
         "parameters": [
           {
             "name": "id",
             "in": "path",
-            "description": "Id of schema to delete",
+            "description": "Id of integration to delete",
             "required": true,
             "schema": {
               "type": "string",
@@ -532,11 +470,11 @@
         ],
         "responses": {
           "2XX": {
-            "description": "Make response",
+            "description": "Integration response",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/SuccessDeleteSchema"
+                  "$ref": "#/components/schemas/SuccessDeleteIntegration"
                 }
               }
             }
@@ -564,12 +502,12 @@
         }
       },
       "get": {
-        "description": "Given the schema id returns the asssociated schema",
+        "description": "Given the integration id returns the asssociated integration",
         "parameters": [
           {
             "name": "id",
             "in": "path",
-            "description": "Id of schema to return",
+            "description": "Id of integration to return",
             "required": true,
             "schema": {
               "type": "string",
@@ -579,11 +517,11 @@
         ],
         "responses": {
           "2XX": {
-            "description": "Schema response",
+            "description": "metric response",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/SuccessGetSchema"
+                  "$ref": "#/components/schemas/SuccessGetIntegration"
                 }
               }
             }
@@ -611,74 +549,25 @@
         }
       }
     },
-    "/schema/{assetId}": {
-      "get": {
-        "description": "Given the asset id returns the asssociated schema",
-        "parameters": [
-          {
-            "name": "assetId",
-            "in": "path",
-            "description": "Id of asset related to schema",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "2XX": {
-            "description": "Schema response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/SuccessGetSchema"
-                }
-              }
-            }
-          },
-          "4XX": {
-            "description": "Failed request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ResponseFail"
-                }
-              }
-            }
-          },
-          "5XX": {
-            "description": "Unexpected error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ResponseError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/schema": {
+    "/integration": {
       "post": {
-        "description": "Creates a new schema",
+        "description": "Creates a new integration",
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/RequestPostSchema"
+                "$ref": "#/components/schemas/RequestPostIntegration"
               }
             }
           }
         },
         "responses": {
           "2XX": {
-            "description": "Schema response",
+            "description": "Integration response",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/SuccessPostSchema"
+                  "$ref": "#/components/schemas/SuccessPostIntegration"
                 }
               }
             }
@@ -706,23 +595,470 @@
         }
       },
       "put": {
-        "description": "Updates a schema",
+        "description": "Updates an integration",
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/RequestPutSchema"
+                "$ref": "#/components/schemas/RequestPutIntegration"
               }
             }
           }
         },
         "responses": {
           "2XX": {
-            "description": "Schema response",
+            "description": "Metric response",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/SuccessPutSchema"
+                  "$ref": "#/components/schemas/SuccessPutIntegration"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "description": "Failed request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseFail"
+                }
+              }
+            }
+          },
+          "5XX": {
+            "description": "Unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/metric/{id}": {
+      "delete": {
+        "description": "Given the metric id deletes the associated metric",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Id of metric to delete",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "2XX": {
+            "description": "Metric response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessDeleteMetric"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "description": "Failed request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseFail"
+                }
+              }
+            }
+          },
+          "5XX": {
+            "description": "Unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "description": "Given the metric id returns the asssociated metric",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Id of metric to return",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "2XX": {
+            "description": "Metric response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessGetMetric"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "description": "Failed request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseFail"
+                }
+              }
+            }
+          },
+          "5XX": {
+            "description": "Unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/metric": {
+      "post": {
+        "description": "Creates a new metric",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RequestPostMetric"
+              }
+            }
+          }
+        },
+        "responses": {
+          "2XX": {
+            "description": "Metric response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessPostMetric"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "description": "Failed request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseFail"
+                }
+              }
+            }
+          },
+          "5XX": {
+            "description": "Unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "description": "Updates a metric",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RequestPutMetric"
+              }
+            }
+          }
+        },
+        "responses": {
+          "2XX": {
+            "description": "Metric response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessPutMetric"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "description": "Failed request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseFail"
+                }
+              }
+            }
+          },
+          "5XX": {
+            "description": "Unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/process/{id}": {
+      "delete": {
+        "description": "Given the process id deletes the associated process",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Id of process to delete",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "2XX": {
+            "description": "Process response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessDeleteProcess"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "description": "Failed request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseFail"
+                }
+              }
+            }
+          },
+          "5XX": {
+            "description": "Unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "description": "Given the process id returns the asssociated process",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Id of process to return",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "2XX": {
+            "description": "Process response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessGetProcess"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "description": "Failed request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseFail"
+                }
+              }
+            }
+          },
+          "5XX": {
+            "description": "Unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/process": {
+      "post": {
+        "description": "Creates a new process",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RequestPostProcess"
+              }
+            }
+          }
+        },
+        "responses": {
+          "2XX": {
+            "description": "Process response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessPostProcess"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "description": "Failed request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseFail"
+                }
+              }
+            }
+          },
+          "5XX": {
+            "description": "Unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "description": "Updates a process",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RequestPutProcess"
+              }
+            }
+          }
+        },
+        "responses": {
+          "2XX": {
+            "description": "Process response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessPutProcess"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "description": "Failed request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseFail"
+                }
+              }
+            }
+          },
+          "5XX": {
+            "description": "Unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/records": {
+      "get": {
+        "description": "Given the filters, returns all the records associated with the metrics",
+        "parameters": [
+          {
+            "name": "metrics",
+            "in": "query",
+            "required": true,
+            "description": "The metrics for which the records are to be returned",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "uuid"
+              }
+            }
+          },
+          {
+            "name": "startTs",
+            "in": "query",
+            "required": true,
+            "description": "the start of the date range, expressed in unix timestamp, for which the records are to be returned",
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "example": 1725000000
+            }
+          },
+
+          {
+            "name": "endTs",
+            "in": "query",
+            "required": true,
+            "description": "the end of the date range, expressed in unix timestamp, for which the records are to be returned",
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "example": 1727220000
+            }
+          }
+        ],
+        "responses": {
+          "2XX": {
+            "description": "Get records response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessGetRecords"
                 }
               }
             }
@@ -755,6 +1091,7 @@
     "schemas": {
       "SuccessGetAssets": {
         "type": "object",
+        "required": ["status", "data"],
         "properties": {
           "status": {
             "type": "string",
@@ -765,6 +1102,11 @@
             "type": "object",
             "description": "The data associated with the response",
             "properties": {
+              "execution": {
+                "description": "The execution id of the request",
+                "type": "string",
+                "format": "uuid"
+              },
               "assets": {
                 "description": "The returned assets",
                 "type": "array",
@@ -778,6 +1120,7 @@
       },
       "SuccessGetAsset": {
         "type": "object",
+        "required": ["status", "data"],
         "properties": {
           "status": {
             "type": "string",
@@ -788,6 +1131,11 @@
             "type": "object",
             "description": "The data associated with the response",
             "properties": {
+              "execution": {
+                "description": "The execution id of the request",
+                "type": "string",
+                "format": "uuid"
+              },
               "asset": {
                 "description": "The returned asset",
                 "$ref": "#/components/schemas/ResponseAsset"
@@ -798,6 +1146,7 @@
       },
       "SuccessDeleteAsset": {
         "type": "object",
+        "required": ["status", "data"],
         "properties": {
           "status": {
             "type": "string",
@@ -808,6 +1157,11 @@
             "type": "object",
             "description": "The data associated with the response",
             "properties": {
+              "execution": {
+                "description": "The execution id of the request",
+                "type": "string",
+                "format": "uuid"
+              },
               "message": {
                 "description": "Message indicating the succesful deletion of the asset",
                 "example": "Asset deleted successfully",
@@ -819,6 +1173,7 @@
       },
       "SuccessPostAsset": {
         "type": "object",
+        "required": ["status", "data"],
         "properties": {
           "status": {
             "type": "string",
@@ -829,6 +1184,11 @@
             "type": "object",
             "description": "The data associated with the response",
             "properties": {
+              "execution": {
+                "description": "The execution id of the request",
+                "type": "string",
+                "format": "uuid"
+              },
               "asset": {
                 "description": "The created asset",
                 "$ref": "#/components/schemas/ResponseAsset"
@@ -839,6 +1199,7 @@
       },
       "SuccessPutAsset": {
         "type": "object",
+        "required": ["status", "data"],
         "properties": {
           "status": {
             "type": "string",
@@ -849,6 +1210,11 @@
             "type": "object",
             "description": "The data associated with the response",
             "properties": {
+              "execution": {
+                "description": "The execution id of the request",
+                "type": "string",
+                "format": "uuid"
+              },
               "asset": {
                 "description": "The updated asset",
                 "$ref": "#/components/schemas/ResponseAsset"
@@ -859,7 +1225,7 @@
       },
       "RequestPostAsset": {
         "type": "object",
-        "required": ["name", "make", "schema"],
+        "required": ["name", "make"],
         "properties": {
           "name": {
             "description": "The name of the asset",
@@ -871,11 +1237,14 @@
             "example": "<uuid>",
             "format": "uuid"
           },
-          "schema": {
-            "description": "The id of schema of the asset",
-            "type": "string",
-            "example": "<uuid>",
-            "format": "uuid"
+          "metrics": {
+            "description": "The id of metrics associated with the asset",
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid",
+              "example": "<uuid>"
+            }
           },
           "metadata": {
             "description": "The metadata associated with the asset",
@@ -886,7 +1255,7 @@
       },
       "RequestPutAsset": {
         "type": "object",
-        "required": ["name", "make", "schema", "id"],
+        "required": ["id"],
         "properties": {
           "id": {
             "description": "The id of the asset",
@@ -904,11 +1273,14 @@
             "example": "<uuid>",
             "format": "uuid"
           },
-          "schema": {
-            "description": "The id of schema of the asset",
-            "type": "string",
-            "example": "<uuid>",
-            "format": "uuid"
+          "metrics": {
+            "description": "The id of metrics associated with the asset",
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid",
+              "example": "<uuid>"
+            }
           },
           "metadata": {
             "description": "The metadata associated with the asset",
@@ -924,7 +1296,7 @@
           "updated_at",
           "name",
           "make",
-          "schema",
+          "metrics",
           "metadata"
         ],
         "properties": {
@@ -954,11 +1326,15 @@
             "example": "<uuid>",
             "format": "uuid"
           },
-          "schema": {
-            "description": "The id of schema of the asset",
-            "type": "string",
-            "example": "<uuid>",
-            "format": "uuid"
+          "metrics": {
+            "description": "The id of metrics associated with the asset",
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid",
+              "example": "<uuid>"
+            },
+            "nullable": true
           },
           "metadata": {
             "description": "The metadata associated with the asset",
@@ -969,6 +1345,7 @@
       },
       "SuccessGetMakes": {
         "type": "object",
+        "required": ["status", "data"],
         "properties": {
           "status": {
             "type": "string",
@@ -979,7 +1356,12 @@
             "type": "object",
             "description": "The data associated with the response",
             "properties": {
-              "assets": {
+              "execution": {
+                "description": "The execution id of the request",
+                "type": "string",
+                "format": "uuid"
+              },
+              "makes": {
                 "description": "The returned makes",
                 "type": "array",
                 "items": {
@@ -992,6 +1374,7 @@
       },
       "SuccessGetMake": {
         "type": "object",
+        "required": ["status", "data"],
         "properties": {
           "status": {
             "type": "string",
@@ -1002,7 +1385,12 @@
             "type": "object",
             "description": "The data associated with the response",
             "properties": {
-              "asset": {
+              "execution": {
+                "description": "The execution id of the request",
+                "type": "string",
+                "format": "uuid"
+              },
+              "make": {
                 "description": "The returned make",
                 "$ref": "#/components/schemas/ResponseMake"
               }
@@ -1012,6 +1400,7 @@
       },
       "SuccessDeleteMake": {
         "type": "object",
+        "required": ["status", "data"],
         "properties": {
           "status": {
             "type": "string",
@@ -1022,6 +1411,11 @@
             "type": "object",
             "description": "The data associated with the response",
             "properties": {
+              "execution": {
+                "description": "The execution id of the request",
+                "type": "string",
+                "format": "uuid"
+              },
               "message": {
                 "description": "Message indicating the succesful deletion of the make",
                 "example": "Make deleted successfully",
@@ -1033,6 +1427,7 @@
       },
       "SuccessPostMake": {
         "type": "object",
+        "required": ["status", "data"],
         "properties": {
           "status": {
             "type": "string",
@@ -1043,7 +1438,12 @@
             "type": "object",
             "description": "The data associated with the response",
             "properties": {
-              "asset": {
+              "execution": {
+                "description": "The execution id of the request",
+                "type": "string",
+                "format": "uuid"
+              },
+              "make": {
                 "description": "The created make",
                 "$ref": "#/components/schemas/ResponseMake"
               }
@@ -1053,6 +1453,7 @@
       },
       "SuccessPutMake": {
         "type": "object",
+        "required": ["status", "data"],
         "properties": {
           "status": {
             "type": "string",
@@ -1063,7 +1464,12 @@
             "type": "object",
             "description": "The data associated with the response",
             "properties": {
-              "asset": {
+              "execution": {
+                "description": "The execution id of the request",
+                "type": "string",
+                "format": "uuid"
+              },
+              "make": {
                 "description": "The updated make",
                 "$ref": "#/components/schemas/ResponseMake"
               }
@@ -1073,12 +1479,8 @@
       },
       "RequestPostMake": {
         "type": "object",
-        "required": ["name", "type", "brand", "model"],
+        "required": ["type", "brand", "model", "version"],
         "properties": {
-          "name": {
-            "description": "The name of the make",
-            "type": "string"
-          },
           "type": {
             "description": "The type of device the make refers to",
             "type": "string",
@@ -1093,6 +1495,19 @@
           "model": {
             "description": "The model of the make",
             "type": "string"
+          },
+          "version": {
+            "description": "The version of the make",
+            "type": "string"
+          },
+          "integrations": {
+            "description": "The integrations associated with the make",
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid",
+              "example": "<uuid>"
+            }
           },
           "metadata": {
             "description": "The metadata associated with the make",
@@ -1103,17 +1518,13 @@
       },
       "RequestPutMake": {
         "type": "object",
-        "required": ["id", "name", "type", "brand", "model"],
+        "required": ["id"],
         "properties": {
           "id": {
             "description": "The id of the asset",
             "type": "string",
             "example": "<uuid>",
             "format": "uuid"
-          },
-          "name": {
-            "description": "The name of the make",
-            "type": "string"
           },
           "type": {
             "description": "The type of device the make refers to",
@@ -1129,6 +1540,19 @@
           "model": {
             "description": "The model of the make",
             "type": "string"
+          },
+          "version": {
+            "description": "The version of the make",
+            "type": "string"
+          },
+          "integrations": {
+            "description": "The integrations associated with the make",
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid",
+              "example": "<uuid>"
+            }
           },
           "metadata": {
             "description": "The metadata associated with the make",
@@ -1143,10 +1567,11 @@
           "id",
           "created_at",
           "updated_at",
-          "name",
           "type",
           "brand",
           "model",
+          "version",
+          "integrations",
           "metadata"
         ],
         "properties": {
@@ -1166,10 +1591,6 @@
             "type": "string",
             "format": "date-time"
           },
-          "name": {
-            "description": "The name of the make",
-            "type": "string"
-          },
           "type": {
             "description": "The type of device the make refers to",
             "type": "string",
@@ -1183,6 +1604,20 @@
             "description": "The model of the make",
             "type": "string"
           },
+          "version": {
+            "description": "The version of the make",
+            "type": "string"
+          },
+          "integrations": {
+            "description": "The integrations associated with the make",
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid",
+              "example": "<uuid>"
+            },
+            "nullable": true
+          },
           "metadata": {
             "description": "The metadata associated with the make",
             "type": "string",
@@ -1190,8 +1625,9 @@
           }
         }
       },
-      "SuccessGetSchema": {
+      "SuccessGetIntegration": {
         "type": "object",
+        "required": ["status", "data"],
         "properties": {
           "status": {
             "type": "string",
@@ -1202,16 +1638,22 @@
             "type": "object",
             "description": "The data associated with the response",
             "properties": {
-              "asset": {
-                "description": "The returned schema",
-                "$ref": "#/components/schemas/ResponseSchema"
+              "execution": {
+                "description": "The execution id of the request",
+                "type": "string",
+                "format": "uuid"
+              },
+              "integration": {
+                "description": "The returned integration",
+                "$ref": "#/components/schemas/ResponseIntegration"
               }
             }
           }
         }
       },
-      "SuccessDeleteSchema": {
+      "SuccessDeleteIntegration": {
         "type": "object",
+        "required": ["status", "data"],
         "properties": {
           "status": {
             "type": "string",
@@ -1222,17 +1664,23 @@
             "type": "object",
             "description": "The data associated with the response",
             "properties": {
+              "execution": {
+                "description": "The execution id of the request",
+                "type": "string",
+                "format": "uuid"
+              },
               "message": {
-                "description": "Message indicating the succesful deletion of the schema",
-                "example": "Schema deleted successfully",
+                "description": "Message indicating the succesful deletion of the integration",
+                "example": "metric deleted successfully",
                 "type": "string"
               }
             }
           }
         }
       },
-      "SuccessPostSchema": {
+      "SuccessPostIntegration": {
         "type": "object",
+        "required": ["status", "data"],
         "properties": {
           "status": {
             "type": "string",
@@ -1243,16 +1691,22 @@
             "type": "object",
             "description": "The data associated with the response",
             "properties": {
-              "asset": {
-                "description": "The created schema",
-                "$ref": "#/components/schemas/ResponseSchema"
+              "execution": {
+                "description": "The execution id of the request",
+                "type": "string",
+                "format": "uuid"
+              },
+              "integration": {
+                "description": "The created integration",
+                "$ref": "#/components/schemas/ResponseIntegration"
               }
             }
           }
         }
       },
-      "SuccessPutSchema": {
+      "SuccessPutIntegration": {
         "type": "object",
+        "required": ["status", "data"],
         "properties": {
           "status": {
             "type": "string",
@@ -1263,90 +1717,198 @@
             "type": "object",
             "description": "The data associated with the response",
             "properties": {
-              "asset": {
-                "description": "The updated schema",
-                "$ref": "#/components/schemas/ResponseSchema"
+              "execution": {
+                "description": "The execution id of the request",
+                "type": "string",
+                "format": "uuid"
+              },
+              "integration": {
+                "description": "The updated integration",
+                "$ref": "#/components/schemas/ResponseIntegration"
               }
             }
           }
         }
       },
-      "RequestPostSchema": {
+      "RequestPostIntegration": {
         "type": "object",
+        "required": [
+          "name",
+          "protocol",
+          "type",
+          "granularities",
+          "maxTimeRange",
+          "frequency"
+        ],
         "properties": {
-          "metrics": {
-            "description": "The id(s) of the metrics associated with the schema",
+          "name": {
+            "description": "The name of the integration",
+            "type": "string"
+          },
+          "protocol": {
+            "description": "The protocol of the integration",
+            "type": "string",
+            "enum": [
+              "HTTP",
+              "MQTT",
+              "Websocket",
+              "Modbus",
+              "Backnet",
+              "DBQuery"
+            ]
+          },
+          "type": {
+            "description": "The type of the integration",
+            "type": "string",
+            "enum": ["pull", "push"]
+          },
+          "granularities": {
+            "description": "The time granularities supported by the integration",
             "type": "array",
             "items": {
               "type": "string",
-              "format": "uuid",
-              "example": "<uuid>"
+              "example": "5m"
             }
           },
+          "maxTimeRange": {
+            "description": "The maximum time range supported by the integration",
+            "type": "string",
+            "example": "1mo"
+          },
+          "frequency": {
+            "description": "The frequency  of invocation supported by the integration, as cron expression",
+            "type": "string",
+            "example": "* * * * *"
+          },
           "metadata": {
-            "description": "The metadata associated with the make",
+            "description": "The metadata associated with the integration",
             "type": "string",
             "nullable": true
           }
         }
       },
-      "RequestPutSchema": {
+      "RequestPutIntegration": {
         "type": "object",
         "required": ["id"],
         "properties": {
-          "id": {
-            "description": "The id of the asset",
-            "type": "string",
-            "example": "<uuid>",
-            "format": "uuid"
+          "name": {
+            "description": "The name of the integration",
+            "type": "string"
           },
-          "metrics": {
-            "description": "The id(s) of the metrics associated with the schema",
+          "protocol": {
+            "description": "The protocol of the integration",
+            "type": "string",
+            "enum": [
+              "HTTP",
+              "MQTT",
+              "Websocket",
+              "Modbus",
+              "Backnet",
+              "DBQuery"
+            ]
+          },
+          "type": {
+            "description": "The type of the integration",
+            "type": "string",
+            "enum": ["pull", "push"]
+          },
+          "granularities": {
+            "description": "The time granularities supported by the integration",
             "type": "array",
             "items": {
               "type": "string",
-              "format": "uuid",
-              "example": "<uuid>"
+              "example": "5m"
             }
           },
+          "maxTimeRange": {
+            "description": "The maximum time range supported by the integration",
+            "type": "string",
+            "example": "1mo"
+          },
+          "frequency": {
+            "description": "The frequency  of invocation supported by the integration, as cron expression",
+            "type": "string",
+            "example": "* * * * *"
+          },
           "metadata": {
-            "description": "The metadata associated with the make",
+            "description": "The metadata associated with the integration",
             "type": "string",
             "nullable": true
           }
         }
       },
-      "ResponseSchema": {
+      "ResponseIntegration": {
         "type": "object",
-        "required": ["id", "created_at", "updated_at", "metrics", "metadata"],
+        "required": [
+          "id",
+          "created_at",
+          "updated_at",
+          "name",
+          "protocol",
+          "type",
+          "granularities",
+          "maxTimeRange",
+          "frequency",
+          "metadata"
+        ],
         "properties": {
           "id": {
-            "description": "the id of the schema",
+            "description": "the id of the integration",
             "type": "string",
             "example": "<uuid>",
             "format": "uuid"
           },
           "created_at": {
-            "description": "the time the schema was created",
+            "description": "the time the integration was created",
             "type": "string",
             "format": "date-time"
           },
           "updated_at": {
-            "description": "the time the schema was updated",
+            "description": "the time the integration was updated",
             "type": "string",
             "format": "date-time"
           },
-          "metrics": {
-            "description": "The id(s) of the metrics associated with the schema",
+          "name": {
+            "description": "The name of the integration",
+            "type": "string"
+          },
+          "protocol": {
+            "description": "The protocol of the integration",
+            "type": "string",
+            "enum": [
+              "HTTP",
+              "MQTT",
+              "Websocket",
+              "Modbus",
+              "Backnet",
+              "DBQuery"
+            ]
+          },
+          "type": {
+            "description": "The type of the integration",
+            "type": "string",
+            "enum": ["pull", "push"]
+          },
+          "granularities": {
+            "description": "The time granularities supported by the integration",
             "type": "array",
             "items": {
               "type": "string",
-              "format": "uuid",
-              "example": "<uuid>"
+              "example": "5m"
             }
           },
+          "maxTimeRange": {
+            "description": "The maximum time range supported by the integration",
+            "type": "string",
+            "example": "1mo"
+          },
+          "frequency": {
+            "description": "The frequency  of invocation supported by the integration, as cron expression",
+            "type": "string",
+            "example": "* * * * *"
+          },
           "metadata": {
-            "description": "The metadata associated with the make",
+            "description": "The metadata associated with the integration",
             "type": "string",
             "nullable": true
           }
@@ -1354,6 +1916,7 @@
       },
       "SuccessGetMetric": {
         "type": "object",
+        "required": ["status", "data"],
         "properties": {
           "status": {
             "type": "string",
@@ -1364,7 +1927,12 @@
             "type": "object",
             "description": "The data associated with the response",
             "properties": {
-              "asset": {
+              "execution": {
+                "description": "The execution id of the request",
+                "type": "string",
+                "format": "uuid"
+              },
+              "metric": {
                 "description": "The returned metric",
                 "$ref": "#/components/schemas/ResponseMetric"
               }
@@ -1374,6 +1942,7 @@
       },
       "SuccessDeleteMetric": {
         "type": "object",
+        "required": ["status", "data"],
         "properties": {
           "status": {
             "type": "string",
@@ -1384,6 +1953,11 @@
             "type": "object",
             "description": "The data associated with the response",
             "properties": {
+              "execution": {
+                "description": "The execution id of the request",
+                "type": "string",
+                "format": "uuid"
+              },
               "message": {
                 "description": "Message indicating the succesful deletion of the metric",
                 "example": "Metric deleted successfully",
@@ -1395,6 +1969,7 @@
       },
       "SuccessPostMetric": {
         "type": "object",
+        "required": ["status", "data"],
         "properties": {
           "status": {
             "type": "string",
@@ -1405,7 +1980,12 @@
             "type": "object",
             "description": "The data associated with the response",
             "properties": {
-              "asset": {
+              "execution": {
+                "description": "The execution id of the request",
+                "type": "string",
+                "format": "uuid"
+              },
+              "metric": {
                 "description": "The created metric",
                 "$ref": "#/components/schemas/ResponseMetric"
               }
@@ -1415,6 +1995,7 @@
       },
       "SuccessPutMetric": {
         "type": "object",
+        "required": ["status", "data"],
         "properties": {
           "status": {
             "type": "string",
@@ -1425,7 +2006,12 @@
             "type": "object",
             "description": "The data associated with the response",
             "properties": {
-              "asset": {
+              "execution": {
+                "description": "The execution id of the request",
+                "type": "string",
+                "format": "uuid"
+              },
+              "metric": {
                 "description": "The updated metric",
                 "$ref": "#/components/schemas/ResponseMetric"
               }
@@ -1435,34 +2021,34 @@
       },
       "RequestPostMetric": {
         "type": "object",
-        "required": [
-          "name",
-          "processId",
-          "variable",
-          "units",
-          "timeGranularity",
-          "type",
-          "metadata"
-        ],
+        "required": ["name", "variable", "units", "granularity", "type"],
         "properties": {
-          "process": {
-            "description": "The process associated with the metric",
-            "type": "object",
-            "properties": {
-              "type": {
-                "description": "The name of the process",
-                "type": "string"
-              },
-              "description": {
-                "description": "The description of the process",
-                "type": "string"
-              }
-            },
-            "items": {
-              "type": "string",
-              "format": "uuid",
-              "example": "<uuid>"
-            }
+          "processId": {
+            "description": "The id of the process associated with the metric",
+            "type": "string",
+            "example": "<uuid>",
+            "format": "uuid"
+          },
+          "name": {
+            "description": "The name of the metric",
+            "type": "string"
+          },
+          "variable": {
+            "description": "The variable associated with the metric",
+            "type": "string"
+          },
+          "units": {
+            "description": "The units associated with the metric",
+            "type": "string"
+          },
+          "granularity": {
+            "description": "The granularity of the metric",
+            "type": "string"
+          },
+          "type": {
+            "description": "The type of data associated with the metric",
+            "type": "string",
+            "enum": ["number", "boolean", "string"]
           },
           "metadata": {
             "description": "The metadata associated with the metric",
@@ -1476,24 +2062,460 @@
         "required": ["id"],
         "properties": {
           "id": {
-            "description": "The id of the asset",
+            "description": "The id of the metric",
             "type": "string",
             "example": "<uuid>",
             "format": "uuid"
           },
-          "metrics": {
-            "description": "The id(s) of the metrics associated with the schema",
+          "processId": {
+            "description": "The id of the process associated with the metric",
+            "type": "string",
+            "example": "<uuid>",
+            "format": "uuid"
+          },
+          "name": {
+            "description": "The name of the metric",
+            "type": "string"
+          },
+          "variable": {
+            "description": "The variable associated with the metric",
+            "type": "string"
+          },
+          "units": {
+            "description": "The units associated with the metric",
+            "type": "string"
+          },
+          "granularity": {
+            "description": "The granularity of the metric",
+            "type": "string"
+          },
+          "type": {
+            "description": "The type of data associated with the metric",
+            "type": "string",
+            "enum": ["number", "boolean", "string"]
+          },
+          "metadata": {
+            "description": "The metadata associated with the metric",
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "ResponseMetric": {
+        "type": "object",
+        "required": [
+          "id",
+          "created_at",
+          "updated_at",
+          "processId",
+          "name",
+          "variable",
+          "granularity",
+          "units",
+          "type",
+          "metadata"
+        ],
+        "properties": {
+          "id": {
+            "description": "The id of the metric",
+            "type": "string",
+            "example": "<uuid>",
+            "format": "uuid"
+          },
+          "created_at": {
+            "description": "the time the metric was created",
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "description": "the time the metric was updated",
+            "type": "string",
+            "format": "date-time"
+          },
+          "processId": {
+            "description": "The id of the process associated with the metric",
+            "type": "string",
+            "example": "<uuid>",
+            "format": "uuid"
+          },
+          "name": {
+            "description": "The name of the metric",
+            "type": "string"
+          },
+          "variable": {
+            "description": "The variable associated with the metric",
+            "type": "string"
+          },
+          "units": {
+            "description": "The units associated with the metric",
+            "type": "string"
+          },
+          "granularity": {
+            "description": "The granularity of the metric",
+            "type": "string"
+          },
+          "type": {
+            "description": "The type of data associated with the metric",
+            "type": "string",
+            "enum": ["number", "boolean", "string"]
+          },
+          "metadata": {
+            "description": "The metadata associated with the metric",
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "SuccessGetProcess": {
+        "type": "object",
+        "required": ["status", "data"],
+        "properties": {
+          "status": {
+            "type": "string",
+            "example": "success",
+            "description": "Indicates the request was successful"
+          },
+          "data": {
+            "type": "object",
+            "description": "The data associated with the response",
+            "properties": {
+              "execution": {
+                "description": "The execution id of the request",
+                "type": "string",
+                "format": "uuid"
+              },
+              "process": {
+                "description": "The returned process",
+                "$ref": "#/components/schemas/ResponseProcess"
+              }
+            }
+          }
+        }
+      },
+      "SuccessDeleteProcess": {
+        "type": "object",
+        "required": ["status", "data"],
+        "properties": {
+          "status": {
+            "type": "string",
+            "example": "success",
+            "description": "Indicates the request was successful"
+          },
+          "data": {
+            "type": "object",
+            "description": "The data associated with the response",
+            "properties": {
+              "execution": {
+                "description": "The execution id of the request",
+                "type": "string",
+                "format": "uuid"
+              },
+              "message": {
+                "description": "Message indicating the succesful deletion of the process",
+                "example": "Process deleted successfully",
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "SuccessPostProcess": {
+        "type": "object",
+        "required": ["status", "data"],
+        "properties": {
+          "status": {
+            "type": "string",
+            "example": "success",
+            "description": "Indicates the request was successful"
+          },
+          "data": {
+            "type": "object",
+            "description": "The data associated with the response",
+            "properties": {
+              "execution": {
+                "description": "The execution id of the request",
+                "type": "string",
+                "format": "uuid"
+              },
+              "process": {
+                "description": "The created process",
+                "$ref": "#/components/schemas/ResponseProcess"
+              }
+            }
+          }
+        }
+      },
+      "SuccessPutProcess": {
+        "type": "object",
+        "required": ["status", "data"],
+        "properties": {
+          "status": {
+            "type": "string",
+            "example": "success",
+            "description": "Indicates the request was successful"
+          },
+          "data": {
+            "type": "object",
+            "description": "The data associated with the response",
+            "properties": {
+              "execution": {
+                "description": "The execution id of the request",
+                "type": "string",
+                "format": "uuid"
+              },
+              "process": {
+                "description": "The updated process",
+                "$ref": "#/components/schemas/ResponseProcess"
+              }
+            }
+          }
+        }
+      },
+      "RequestPostProcess": {
+        "type": "object",
+        "required": [
+          "integrationId",
+          "metricId",
+          "frequency",
+          "timeRange",
+          "granularity",
+          "formula",
+          "keys"
+        ],
+        "properties": {
+          "integrationId": {
+            "description": "The id of the integration associated with the process",
+            "type": "string",
+            "example": "<uuid>",
+            "format": "uuid"
+          },
+          "metricId": {
+            "description": "The id of the metric associated with the process",
+            "type": "string",
+            "example": "<uuid>",
+            "format": "uuid"
+          },
+          "frequency": {
+            "description": "The frequency of invocation of the process, as cron expression",
+            "type": "string",
+            "example": "0 0 * * *"
+          },
+          "timeRange": {
+            "description": "the amount of data to obtain from each invocation of the process, as a time interval",
+            "type": "string",
+            "example": "1d"
+          },
+          "granularity": {
+            "description": "The granularity of the data ingested/generated by the process",
+            "type": "string",
+            "example": "5m"
+          },
+          "formula": {
+            "description": "The string representation of the formula used to generate the data by the process",
+            "type": "string",
+            "example": "[NODE 1] * 1000"
+          },
+          "keys": {
+            "description": "Array of keys used in the formula, as represented in the datasource to be processed.",
             "type": "array",
             "items": {
               "type": "string",
-              "format": "uuid",
-              "example": "<uuid>"
+              "example": "NODE 1"
             }
           },
           "metadata": {
-            "description": "The metadata associated with the make",
+            "description": "The metadata associated with the process",
             "type": "string",
             "nullable": true
+          }
+        }
+      },
+      "RequestPutProcess": {
+        "type": "object",
+        "required": ["id"],
+        "properties": {
+          "id": {
+            "description": "The id of the process",
+            "type": "string",
+            "example": "<uuid>",
+            "format": "uuid"
+          },
+          "integrationId": {
+            "description": "The id of the integration associated with the process",
+            "type": "string",
+            "example": "<uuid>",
+            "format": "uuid"
+          },
+          "metricId": {
+            "description": "The id of the metric associated with the process",
+            "type": "string",
+            "example": "<uuid>",
+            "format": "uuid"
+          },
+          "frequency": {
+            "description": "The frequency of invocation of the process, as cron expression",
+            "type": "string",
+            "example": "0 0 * * *"
+          },
+          "timeRange": {
+            "description": "the amount of data to obtain from each invocation of the process, as a time interval",
+            "type": "string",
+            "example": "1d"
+          },
+          "granularity": {
+            "description": "The granularity of the data ingested/generated by the process",
+            "type": "string",
+            "example": "5m"
+          },
+          "formula": {
+            "description": "The string representation of the formula used to generate the data by the process",
+            "type": "string",
+            "example": "[NODE 1] * 1000"
+          },
+          "keys": {
+            "description": "Array of keys used in the formula, as represented in the datasource to be processed.",
+            "type": "array",
+            "items": {
+              "type": "string",
+              "example": "NODE 1"
+            }
+          },
+          "metadata": {
+            "description": "The metadata associated with the process",
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "ResponseProcess": {
+        "type": "object",
+        "required": [
+          "id",
+          "created_at",
+          "updated_at",
+          "integrationId",
+          "metricId",
+          "frequency",
+          "timeRange",
+          "granularity",
+          "formula",
+          "keys"
+        ],
+        "properties": {
+          "id": {
+            "description": "The id of the process",
+            "type": "string",
+            "example": "<uuid>",
+            "format": "uuid"
+          },
+          "created_at": {
+            "description": "the time the process was created",
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "description": "the time the process was updated",
+            "type": "string",
+            "format": "date-time"
+          },
+          "integrationId": {
+            "description": "The id of the integration associated with the process",
+            "type": "string",
+            "example": "<uuid>",
+            "format": "uuid"
+          },
+          "metricId": {
+            "description": "The id of the metric associated with the process",
+            "type": "string",
+            "example": "<uuid>",
+            "format": "uuid"
+          },
+          "frequency": {
+            "description": "The frequency of invocation of the process, as cron expression",
+            "type": "string",
+            "example": "0 0 * * *"
+          },
+          "timeRange": {
+            "description": "the amount of data to obtain from each invocation of the process, as a time interval",
+            "type": "string",
+            "example": "1d"
+          },
+          "granularity": {
+            "description": "The granularity of the data ingested/generated by the process",
+            "type": "string",
+            "example": "5m"
+          },
+          "formula": {
+            "description": "The string representation of the formula used to generate the data by the process",
+            "type": "string",
+            "example": "[NODE 1] * 1000"
+          },
+          "keys": {
+            "description": "Array of keys used in the formula, as represented in the datasource to be processed.",
+            "type": "array",
+            "items": {
+              "type": "string",
+              "example": "NODE 1"
+            }
+          },
+          "metadata": {
+            "description": "The metadata associated with the process",
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "SuccessGetRecords": {
+        "type": "object",
+        "required": ["status", "data"],
+        "properties": {
+          "status": {
+            "type": "string",
+            "example": "success",
+            "description": "Indicates the request was successful"
+          },
+          "data": {
+            "type": "object",
+            "description": "The data associated with the response",
+            "properties": {
+              "execution": {
+                "description": "The execution id of the request",
+                "type": "string",
+                "format": "uuid"
+              },
+              "metrics": {
+                "type": "array",
+                "description": "The metrics associated with the records",
+                "items": {
+                  "type": "string",
+                  "format": "uuid",
+                  "example": "<uuid>"
+                }
+              },
+              "records": {
+                "type": "array",
+                "description": "The metric records",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "ts": {
+                      "description": "The date time associated with the record",
+                      "type": "integer",
+                      "format": "int64",
+                      "example": 1727220785
+                    },
+                    "values": {
+                      "description": "The value associated with the record, ordered by the metric ids",
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "example": "1000"
+                      }
+                    }
+                  }
+                }
+              }
+            }
           }
         }
       },
@@ -1508,6 +2530,11 @@
           "data": {
             "type": "object",
             "properties": {
+              "execution": {
+                "description": "The execution id of the request",
+                "type": "string",
+                "format": "uuid"
+              },
               "[parameter]": {
                 "type": "string",
                 "example": "Message describing the invalid parameter or value associated with the request",
@@ -1518,12 +2545,17 @@
         }
       },
       "ResponseError": {
-        "required": ["status", "message"],
+        "required": ["status", "execution", "message", "code"],
         "type": "object",
         "properties": {
           "status": {
             "type": "string",
             "example": "error"
+          },
+          "execution": {
+            "description": "The execution id of the request",
+            "type": "string",
+            "format": "uuid"
           },
           "message": {
             "type": "string",

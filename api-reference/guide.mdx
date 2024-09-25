@@ -1,0 +1,347 @@
+---
+title: 'Guide'
+description: 'Batu Metrics API v1'
+---
+
+## Introduction
+
+This reference is your key to a comprehensive understanding of the Batu Metrics API.
+
+<Note>
+❗ You need an integration token to interact with the Batu Metrics API. Contact us to request your integration key.
+
+</Note>
+
+### **Conventions**
+
+The base URL to send all API requests is `https://production.batuenergy.com` and `https://api-sandbox.batuenergy.com`. HTTPS is required for all API requests.
+
+The Batu API follows RESTful conventions when possible, with most operations performed via `GET`, `POST`, `PUT`, and `DELETE` requests on page and database resources. Request and response bodies are encoded as JSON.
+
+**JSON CONVENTIONS**
+
+- [JSend](https://github.com/omniti-labs/jsend) convention is used for responses.
+- Top-level resources have an `"object"` property. This property can be used to determine the type of the resource (e.g. `"asset"`, `"metrics"`, etc.)
+- Top-level resources are addressable by a UUIDv4 `"id"` property. You may omit dashes from the ID when making requests to the API.
+- Uri paths and methods are in `kebab-case`(not `camelCase` or `snake_case` ).
+- Resource properties are in `camelCase` (not `kebab-case`or `snake_case` ).
+- Temporal values (dates and datetimes) are encoded in [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) strings. Datetimes will include the time value (`2020-08-12T02:12:33.231Z`) while dates will include only the date (`2020-08-12`)
+- The Batu API does not support empty strings. To unset a string value for properties use an explicit `null` instead of `""`.
+
+### **Code samples & SDKs**
+
+Samples requests and responses are shown for each endpoint. Requests are shown using [cURL](https://curl.se/). These samples make it easy to copy, paste, and modify as you build your integration.
+
+### **Pagination**
+
+Endpoints that return lists of objects support cursor-based pagination requests. By default, Batu returns up to 100 items per API call. If the number of items in a response from a support endpoint exceeds the default, then an integration can use pagination to request a specific set of the results and/or to limit the number of returned items.\*\*\*\*
+
+**RESPONSES**
+
+| **Field**     | **Type**           | **Description**                                                                                                                                                                   |
+| ------------- | ------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `has_more`    | `boolean`          | Whether the response includes the end of the list. `false` if there are no more results. Otherwise, `true`.                                                                       |
+| `next_cursor` | `string`           | A string that can be used to retrieve the next page of results by passing the value as the `start_cursor` parameter to the same endpoint. Only available when `has_more` is true. |
+| `object`      | `"list"`           | The constant string `"list"`.                                                                                                                                                     |
+| `results`     | `array of objects` | The list, or partial list, of endpoint-specific results.                                                                                                                          |
+
+## Request Limits
+
+To ensure a consistent developer experience for all API users, the Batu API is rate limited and basic size limits apply to request parameters.
+
+### Rate Limits
+
+Rate-limited requests will return a `"rate_limited"` error code (HTTP response status 429). **The rate limit for incoming requests per integration is an average of three requests per second.** Some bursts beyond the average rate are allowed.
+
+<Note>
+❗ **Rate limits may change**
+
+In the future, we plan to adjust rate limits to balance for demand and reliability. We may also introduce distinct rate limits for workspaces in different pricing plans.
+
+</Note>
+
+## Status Codes
+
+As per JSend, HTTP response codes are used to indicate general classes of success and error.
+
+### Success Code
+
+| HTTP Status Quote | **Description**                 |
+| ----------------- | ------------------------------- |
+| 200               | Successfully processed request. |
+
+### Fail Codes
+
+Fail responses contain more detail about the failure in the request body.
+
+| HTTP Status Quote | **Description**                    |
+| ----------------- | ---------------------------------- |
+| 400               | Failed request body or parameters. |
+
+### Error Codes
+
+Error responses contain more detail about the error in the processing of the request.
+
+| HTTP Status Quote | **Description**                     |
+| ----------------- | ----------------------------------- |
+| 500               | Error in the processing of request. |
+
+## **Versioning**
+
+Our API versions are named after each major release. For example, our latest version is v0-1.
+
+Set version via the URL:
+
+```bash
+curl https://production.batuenergy.com/v1/asset/e79a0b74-3aba-4149-9f74-0bb5791a6ee6
+  -H "Authorization: Bearer secret_t1CdN9S8yicG5eWLUOfhcWaOscVnFXns"
+```
+
+## Sandbox
+
+For each version of the api there is a sandbox environment with mock responses.
+
+Set sandbox via subdomain:
+
+```bash
+curl https://sandbox.batuenergy.com/v1/asset/e79a0b74-3aba-4149-9f74-0bb5791a6ee6
+  -H "Authorization: Bearer secret_t1CdN9S8yicG5eWLUOfhcWaOscVnFXns"
+```
+
+# Entities
+
+Refers to any object with which you can interact through this API.
+
+## Assets
+
+Refers to any entity that reports metrics records.
+
+### **All assets**
+
+These fields are shared by all assets. Fields marked with \* are always present.
+
+| **Property**  | **Type**        | **Description**                   | **Example value**                        |
+| ------------- | --------------- | --------------------------------- | ---------------------------------------- |
+| `object`\*    | `object: asset` | Always "asset"                    | `"asset"`                                |
+| `id`\*        | `string`(UUID)  | Unique identifier for this asset. | `"e79a0b74-3aba-4149-9f74-0bb5791a6ee6"` |
+| `createdAt`\* | `datetime`      | datetime of creation              | `2024-08-12T02:12:33.231Z`               |
+| `updatedAt`\* | `datetime`      | datetime of update                | `2024-08-12T03:12:33.231Z`               |
+| `name`\*      | `string`        | Asset’s name                      | `"smart meter A012345"`                  |
+| `make`\*      | `string` (UUID) | Asset’s make id                   | `"ba3eb8ca-be65-44d1-8997-762c1993add9"` |
+| `schema`\*    | `string`(UUID)  | Asset’s schema id                 | `"adcb0ad7-c12c-4f4e-b550-30e68610bd5f"` |
+| `metadata`\*  | `string`        | Asset’s metadata                  | `"{'key':'value', ...,}"`                |
+
+### Example
+
+```json
+{
+  "type": "asset",
+  "asset": {
+    "createdAt": "2024-08-12T02:12:33.231Z",
+    "updatedAt": "2024-08-12T03:12:33.231Z",
+    "id": "e79a0b74-3aba-4149-9f74-0bb5791a6ee6",
+    "name": "smart meter A012345",
+    "make": "ba3eb8ca-be65-44d1-8997-762c1993add9",
+    "metrics": [
+      "ebde8fde-cbe4-43a8-af77-91498a0f8c10",
+      "0427865e-6b00-4deb-bb9e-6663b54f2952",
+      "e3f61c00-d837-4bd6-8c9d-45dfdbbf93fe"
+    ],
+    "metadata": "{'key':'value', ...,}"
+  }
+}
+```
+
+## Make
+
+Refers to the manufacturer and model of the asset. This defines the abstraction of the collection of particular logics needed for connecting to the asset’s data source.
+
+### **All makes**
+
+These fields are shared by all makes. Fields marked with \* are always present.
+
+| **Property**                             | **Type**              | **Description**                                                                                | **Example value**                         |
+| ---------------------------------------- | --------------------- | ---------------------------------------------------------------------------------------------- | ----------------------------------------- |
+| `object`\*                               | `object: make`        | Always "make"                                                                                  | `"make"`                                  |
+| `id`\*                                   | `string`(UUID)        | Unique identifier for this make.                                                               | `"ba3eb8ca-be65-44d1-8997-762c1993add9"`  |
+| `type`\*                                 | `string`(Enum)        | Type of the asset. Possible values are : `"METER"` , `"SOLAR INVERTER"` , `"BATTERY"` , `"EV"` | `"METER"`                                 |
+| `createdAt`\*                            | `datetime`            | datetime of creation                                                                           | `2024-08-12T02:12:33.231Z`                |
+| `updatedAt`\*                            | `datetime`            | datetime of update                                                                             | `2024-08-12T03:12:33.231Z`                |
+| `brand`\*                                | `string`              | Make’s brand                                                                                   | `"ACME inc."`                             |
+| `model`\*                                | `string`              | Make’s model                                                                                   | `"smart meter A012345"`                   |
+| `version`\*                              | `string`              | Make’s version                                                                                 | `"1.1.1"`                                 |
+| `integrations` \*                        | `array:string` (UUID) | Make’s associated integrations                                                                 | `["6dffa5c7-1e08-4dce-86bd-a203406a89f6", |
+| "7255dfaf-3000-4004-bbc7-4aa50eba6406"]` |
+| `metadata`\*                             | `string`              | Make’s metadata"                                                                               | `"{'key':'value', ...,}"`                 |
+
+### Example
+
+```json
+{
+  "type": "make",
+  "make": {
+    "id": "ba3eb8ca-be65-44d1-8997-762c1993add9",
+    "createdAt": "2024-08-12T02:12:33.231Z",
+    "updatedAt": "2024-08-12T03:12:33.231Z",
+    "type": "METER",
+    "brand": "ACME inc.",
+    "model": "smart meter",
+    "version": "1.1.1",
+    "integrations": [
+      "6dffa5c7-1e08-4dce-86bd-a203406a89f6",
+      "7255dfaf-3000-4004-bbc7-4aa50eba6406"
+    ],
+    "metadata": "{'key':'value', ...,}"
+  }
+}
+```
+
+## Integration
+
+Refers to the Integration associated with the make. This entity specifies the protocol and characteristics of the way the connection to the data source is established.
+
+### **All integrations**
+
+These fields are shared by all schemas. Fields marked with \* are always present.
+
+| **Property**       | **Type**        | **Description**                                                                                           | **Example value**                        |
+| ------------------ | --------------- | --------------------------------------------------------------------------------------------------------- | ---------------------------------------- |
+| `object`\*         | `object:schema` | Always "schema"                                                                                           | `"schema"`                               |
+| `id`\*             | `string`(UUID)  | Unique identifier for this make.                                                                          | `"6dffa5c7-1e08-4dce-86bd-a203406a89f6"` |
+| `createdAt`\*      | `datetime`      | datetime of creation                                                                                      | `2024-08-12T02:12:33.231Z`               |
+| `updatedAt`\*      | `datetime`      | datetime of update                                                                                        | `2024-08-12T03:12:33.231Z`               |
+| `name`\*           | `string`        | name of the integration                                                                                   | `"smart meter v1.1.1 API integration"`   |
+| `protocol`\*       | `string` (Enum) | communications protocol used by the connection: `HTTP`, `Modbus`, `BACnet`, `MQTT`, `websocket` , `Query` | `HTTP`                                   |
+| `type` \*          | `string` (Enum) | Type of connection established by the integration: `pull` or `push`                                       | `pull`                                   |
+| `granularities` \* | `string`(Enum)  | supported data granularities for the integration, expressed as time intervals: `1m`, `*m`, `5h`, etc.     | `["1m", "5m", "10m", "15m"]`             |
+| `maxTimeRange` \*  | `string` (Enum) | max time range for the obtained data through this integration                                             | `"1mo"`                                  |
+| `frequency`\*      | `string`        | Data sampling frequency for the integration, expressed as a cron expression                               | `"* * * * *"`                            |
+| `metadata`\*       | `string`        | Integration’s metadata                                                                                    | `"{'key':'value', ...,}"`                |
+
+### Example
+
+```json
+{
+  "type": "integration",
+  "schema": {
+    "createdAt": "2024-08-12T02:12:33.231Z",
+    "updatedAt": "2024-08-12T03:12:33.231Z",
+    "id": "6dffa5c7-1e08-4dce-86bd-a203406a89f6",
+    "name": "smart meter v1.1.1 API integration",
+    "protocol": "HTTP",
+    "type": "pull",
+    "granularities": ["1m", "5m", "10m", "15m"],
+    "maxTimeRange": "1mo",
+    "frequency": "* * * * *",
+    "metadata": "{'key':'value', ...,}"
+  }
+}
+```
+
+## Metrics
+
+Refers to the monitored variables and the way they are processed from the asset’s data source. This defines the abstraction of the particular logic needed for ingesting data from the asset’s data source.
+
+### **All metrics**
+
+These fields are shared by all metrics. Fields marked with \* are always present.
+
+| **Property**     | **Type**        | **Description**                                                              | **Example value**                        |
+| ---------------- | --------------- | ---------------------------------------------------------------------------- | ---------------------------------------- |
+| `object`\*       | `object:metric` | Always "metric"                                                              | `"metric"`                               |
+| `id`\*           | `string`(UUID)  | Unique identifier for this metric.                                           | `"ba3eb8ca-be65-44d1-8997-762c1993add9"` |
+| `createdAt`\*    | `datetime`      | datetime of creation                                                         | `2024-08-12T02:12:33.231Z`               |
+| `updatedAt`\*    | `datetime`      | datetime of update                                                           | `2024-08-12T03:12:33.231Z`               |
+| `process` \*     | `string`(UUID)  | id of the process to be performed                                            | `"1447e4ad-4370-4162-80e1-e52098bcb1ed"` |
+| `name` \*        | `string`        | Descriptor of the metric to be ingested                                      | `“Powerplant Demand”`                    |
+| `variable` \*    | `string`(Enum)  | Type of physical variable being observed (refer to SI pending)               | `“demand”`                               |
+| `units`\*        | `string`(Enum)  | [physical units](https://ewh.ieee.org/soc/ias/pub-dept/abbreviation.pdf)     | `“W”`                                    |
+| `granularity` \* | `string`(Enum)  | Frequency of data sampling for the associated metric. Time interval notation | `“5m”`                                   |
+| `type` \*        | `string`(Enum)  | Data Type for the associated metric. `STRING`, `NUMBER`, or, `BOOLEAN`.      | `“NUMBER”`                               |
+| `metadata`\*     | `string`        | Metric’s metadata"                                                           | `"{'key':'value', ...,}"`                |
+
+### Example
+
+```json
+{
+  "type": "metric",
+  "metric": {
+    "createdAt": "2024-08-12T02:12:33.231Z",
+    "updatedAt": "2024-08-12T03:12:33.231Z",
+    "id": "ebde8fde-cbe4-43a8-af77-91498a0f8c10",
+    "processId": "1447e4ad-4370-4162-80e1-e52098bcb1ed",
+    "name": "*Powerplant Demand*",
+    "variable": "demand",
+    "units": "W",
+    "granularity": "5m",
+    "type": "NUMBER",
+    "metadata": "{'key':'value', ...,}"
+  }
+}
+```
+
+## Process
+
+Refers to how the metric is to be processed and stored by the ingestion logic.
+
+### All processes
+
+These fields are shared by all processes. Fields marked with \* are always present.
+
+| **Property**       | **Type**         | **Description**                                                                                                   | **Example value**                        |
+| ------------------ | ---------------- | ----------------------------------------------------------------------------------------------------------------- | ---------------------------------------- |
+| `object`\*         | `object:process` | Always "process"                                                                                                  | `"process"`                              |
+| `id`\*             | `string`(UUID)   | Unique identifier for this process.                                                                               | `"1447e4ad-4370-4162-80e1-e52098bcb1ed"` |
+| `integrationId` \* | `string` (UUID)  | id associated with the integration to be used for the process.                                                    | `"6dffa5c7-1e08-4dce-86bd-a203406a89f6"` |
+| `metricId` \*      | `string` (UUID)  | id associated with the metric that is to be created by the process.                                               | `"ebde8fde-cbe4-43a8-af77-91498a0f8c10"` |
+| `frequency`\*      | `string`         | update frequency for the metric, i.e. the frequency with which the data source will be queried. Cron job notation | `"0 0 * * *"`                            |
+| `timeRange`\*      | `string`         | time window for data retrieval specified for each invocation of the integration, specified as a time interval     | `"1d"`                                   |
+| `granularity` \*   | `string`         | granularity for data retrieval specified for each invocation of the integration, specified as a time interval     | `"5m"`                                   |
+| `formula`\*        | `string`         | A representation of the operations to be performed to obtain the value given the reference `keys` .               | `"[NODE 1 A] + [NODE 1 B]"`              |
+| `keys`\*           | `array:string`   | The keys of the data source from which values are to be retrieved.                                                | `["NODE 1 A", "NODE 1 B"]`               |
+| `metadata`\*       | `string`         | process’s metadata"                                                                                               | `"{'key':'value', ...,}"`                |
+
+### Example
+
+```json
+{
+  "type": "process",
+  "process": {
+    "id": "1447e4ad-4370-4162-80e1-e52098bcb1ed",
+    "integrationId": "6dffa5c7-1e08-4dce-86bd-a203406a89f6",
+    "metricId": "ebde8fde-cbe4-43a8-af77-91498a0f8c10",
+    "frequency": "0 0 * * *",
+    "timeRange": "1d",
+    "granularity": "5m",
+    "formula": "[NODE 1 A] + [NODE 1 B]",
+    "keys": ["NODE 1 A", "NODE 1 B"]
+  }
+}
+```
+
+## Metric Record
+
+Refers to a data point of a metric.
+
+### **All metric records**
+
+These fields are shared by all metrics. Fields marked with \* are always present.
+
+| **Property** | **Type**              | **Description**                                                        | **Example value**                        |
+| ------------ | --------------------- | ---------------------------------------------------------------------- | ---------------------------------------- |
+| `object`\*   | `object:metricRecord` | Always "metricRecord"                                                  | `"metricRecord"`                         |
+| `id`\*       | `string`(UUID)        | Unique identifier for the associated metric.                           | `"ba3eb8ca-be65-44d1-8997-762c1993add9"` |
+| `createdAt`  | `datetime`            | datetime of creation.                                                  | `2024-08-12T02:12:33.231Z`               |
+| `updatedAt`  | `datetime`            | datetime of update.                                                    | `2024-08-12T03:12:33.231Z`               |
+| `ts`\*       | `number`              | datetime associated with metric record, expressed as an Unix timestamp | `1727220785`                             |
+| `value`\*    | `string`              | value associated with metric record.                                   | `"42"`                                   |
+
+### Example
+
+```json
+"security": [
+  {
+    "bearerAuth": []
+  }
+]
+```

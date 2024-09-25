@@ -2,8 +2,8 @@
   "$schema": "https://mintlify.com/schema.json",
   "name": "Batu Metrics API",
   "logo": {
-    "dark": "/logo/dark.svg",
-    "light": "/logo/light.svg"
+    "dark": "/logo/Logo Claro.svg",
+    "light": "/logo/Logo Oscuro.svg"
   },
   "favicon": "/favicon.svg",
   "colors": {
@@ -30,12 +30,11 @@
   "navigation": [
     {
       "group": "API Documentation",
-      "pages": ["api-reference/introduction"]
+      "pages": ["api-reference/guide"]
     },
     {
       "group": "Asset",
       "pages": [
-        "api-reference/endpoint/assets/get",
         "api-reference/endpoint/asset/get",
         "api-reference/endpoint/asset/create",
         "api-reference/endpoint/asset/update",
@@ -51,6 +50,37 @@
         "api-reference/endpoint/make/update",
         "api-reference/endpoint/make/delete"
       ]
+    },
+    {
+      "group": "Integration",
+      "pages": [
+        "api-reference/endpoint/integration/get",
+        "api-reference/endpoint/integration/create",
+        "api-reference/endpoint/integration/update",
+        "api-reference/endpoint/integration/delete"
+      ]
+    },
+    {
+      "group": "Metric",
+      "pages": [
+        "api-reference/endpoint/metric/get",
+        "api-reference/endpoint/metric/create",
+        "api-reference/endpoint/metric/update",
+        "api-reference/endpoint/metric/delete"
+      ]
+    },
+    {
+      "group": "Process",
+      "pages": [
+        "api-reference/endpoint/process/get",
+        "api-reference/endpoint/process/create",
+        "api-reference/endpoint/process/update",
+        "api-reference/endpoint/process/delete"
+      ]
+    },
+    {
+      "group": "Records",
+      "pages": ["api-reference/endpoint/records/get"]
     }
   ],
   "footerSocials": {
