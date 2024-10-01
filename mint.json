@@ -30,7 +30,7 @@
   "navigation": [
     {
       "group": "API Documentation",
-      "pages": ["api-reference/guide"]
+      "pages": ["api-reference/v1"]
     },
     {
       "group": "Asset",
@@ -79,8 +79,20 @@
       ]
     },
     {
-      "group": "Records",
-      "pages": ["api-reference/endpoint/records/get"]
+      "group": "Job",
+      "pages": [
+        "api-reference/endpoint/job/get",
+        "api-reference/endpoint/job/create"
+      ]
+    },
+    {
+      "group": "Metric Records",
+      "pages": ["api-reference/endpoint/metric/records/get"]
+    },
+
+    {
+      "group": "Metric Intervals",
+      "pages": ["api-reference/endpoint/metric/records/intervals/get"]
     }
   ],
   "footerSocials": {

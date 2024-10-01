@@ -1,0 +1,517 @@
+# Metrics API v1
+
+## Introduction
+
+This reference is your key to a comprehensive understanding of the Batu Metrics API.
+
+<Note>
+❗ You need an integration token to interact with the Batu Metrics API. Contact us to request your integration key.
+
+</Note>
+
+### **Conventions**
+
+The base URL to send all API requests is `https://production.batuenergy.com` and `https://sandbox.batuenergy.com`. HTTPS is required for all API requests.
+
+The Batu API follows RESTful conventions when possible, with most operations performed via `GET`, `POST`, `PUT`, and `DELETE` requests on page and database resources. Request and response bodies are encoded as JSON.
+
+**JSON CONVENTIONS**
+
+- [JSend](https://github.com/omniti-labs/jsend) convention is used for responses.
+- Top-level resources have an `"object"` property. This property can be used to determine the type of the resource (e.g. `"asset"`, `"metrics"`, etc.)
+- Top-level resources are addressable by a UUIDv4 `"id"` property. You may omit dashes from the ID when making requests to the API.
+- Uri paths and methods are in `kebab-case`(not `camelCase` or `snake_case` ).
+- Resource properties are in `camelCase` (not `kebab-case`or `snake_case` ).
+- Temporal values (dates and datetimes) are encoded in [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) strings. Datetimes will include the time value (`2020-08-12T02:12:33.231Z`) while dates will include only the date (`2020-08-12`)
+- The Batu API does not support empty strings. To unset a string value for properties use an explicit `null` instead of `""`.
+
+### **Code samples & SDKs**
+
+Samples requests and responses are shown for each endpoint. Requests are shown using [cURL](https://curl.se/). These samples make it easy to copy, paste, and modify as you build your integration.
+
+### **Pagination**
+
+Endpoints that return lists of objects support cursor-based pagination requests. By default, Batu returns up to 100 items per API call. If the number of items in a response from a support endpoint exceeds the default, then an integration can use pagination to request a specific set of the results and/or to limit the number of returned items.\*\*\*\*
+
+**RESPONSES**
+
+| **Field**     | **Type**           | **Description**                                                                                                                                                                   |
+| ------------- | ------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `has_more`    | `boolean`          | Whether the response includes the end of the list. `false` if there are no more results. Otherwise, `true`.                                                                       |
+| `next_cursor` | `string`           | A string that can be used to retrieve the next page of results by passing the value as the `start_cursor` parameter to the same endpoint. Only available when `has_more` is true. |
+| `object`      | `"list"`           | The constant string `"list"`.                                                                                                                                                     |
+| `results`     | `array of objects` | The list, or partial list, of endpoint-specific results.                                                                                                                          |
+
+## Request Limits
+
+To ensure a consistent developer experience for all API users, the Batu API is rate limited and basic size limits apply to request parameters.
+
+### Rate Limits
+
+Rate-limited requests will return a `"rate_limited"` error code (HTTP response status 429). **The rate limit for incoming requests per integration is an average of three requests per second.** Some bursts beyond the average rate are allowed.
+
+<Note>
+❗ **Rate limits may change**
+
+In the future, we plan to adjust rate limits to balance for demand and reliability. We may also introduce distinct rate limits for workspaces in different pricing plans.
+
+</Note>
+
+## Status Codes
+
+As per JSend, HTTP response codes are used to indicate general classes of success, failure, and error.
+
+### Success Code
+
+| HTTP Status Quote | **Description**                 |
+| ----------------- | ------------------------------- |
+| 200               | Successfully processed request. |
+
+### Fail Codes
+
+Fail responses contain more detail about the failure in the request body.
+
+| HTTP Status Quote | **Description**                    |
+| ----------------- | ---------------------------------- |
+| 400               | Failed request body or parameters. |
+
+### Error Codes
+
+Error responses contain more detail about the error in the processing of the request.
+
+| HTTP Status Quote | **Description**                     |
+| ----------------- | ----------------------------------- |
+| 500               | Error in the processing of request. |
+
+## **Versioning**
+
+Our API versions are named after each major release. For example, our latest version is v0-1.
+
+Set version via the URL:
+
+```bash
+curl https://production.batuenergy.com/**v1**/asset/e79a0b74-3aba-4149-9f74-0bb5791a6ee6
+  -H "Authorization: Bearer secret_t1CdN9S8yicG5eWLUOfhcWaOscVnFXns"
+```
+
+## Sandbox
+
+For each version of the api there is a sandbox environment with mock responses.
+
+Set sandbox via subdomain:
+
+```bash
+curl https://**sandbox**.batuenergy.com/**v1**/asset/e79a0b74-3aba-4149-9f74-0bb5791a6ee6
+  -H "Authorization: Bearer secret_t1CdN9S8yicG5eWLUOfhcWaOscVnFXns"
+```
+
+# Entities
+
+Refers to any object with which you can interact through this API.
+
+## Assets
+
+Refers to any entity that reports metrics records.
+
+### **All assets**
+
+These fields are shared by all assets. Fields marked with \* are always present.
+
+| **Property**  | **Type**        | **Description**                   | **Example value**                                                                                                                     |
+| ------------- | --------------- | --------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| `object`\*    | `object: asset` | Always "asset"                    | `"asset"`                                                                                                                             |
+| `id`\*        | `string`(UUID)  | Unique identifier for this asset. | `"ast_e79a0b74-3aba-4149-9f74-0bb5791a6ee6"`                                                                                          |
+| `createdAt`\* | `datetime`      | datetime of creation              | `2024-08-12T02:12:33.231Z`                                                                                                            |
+| `updatedAt`\* | `datetime`      | datetime of update                | `2024-08-12T03:12:33.231Z`                                                                                                            |
+| `name`\*      | `string`        | Asset’s name                      | `"smart meter A012345"`                                                                                                               |
+| `make`\*      | `string` (UUID) | Asset’s make id                   | `"mke_ba3eb8ca-be65-44d1-8997-762c1993add9"`                                                                                          |
+| `metrics`\*   | `string`(UUID)  | Asset’s metrics ids               | `["mtc_ebde8fde-cbe4-43a8-af77-91498a0f8c10","mtc_ebde8fde-cbe4-43a8-af77-91498a0f8c10" ,"mtc_ebde8fde-cbe4-43a8-af77-91498a0f8c10"]` |
+| `metadata`\*  | `string`        | Asset’s metadata                  | `"{'key':'value', ...,}"`                                                                                                             |
+
+### Example
+
+```json
+{
+  "type": "asset",
+  "asset": {
+    "createdAt": "2024-08-12T02:12:33.231Z",
+    "updatedAt": "2024-08-12T03:12:33.231Z",
+    "id": "ast_e79a0b74-3aba-4149-9f74-0bb5791a6ee6",
+    "name": "smart meter A012345",
+    "make": "mke_ba3eb8ca-be65-44d1-8997-762c1993add9",
+    "metrics": [
+      "mtc_ebde8fde-cbe4-43a8-af77-91498a0f8c10",
+      "mtc_0427865e-6b00-4deb-bb9e-6663b54f2952",
+      "mtc_e3f61c00-d837-4bd6-8c9d-45dfdbbf93fe"
+    ],
+    "metadata": "{'key':'value', ...,}"
+  }
+}
+```
+
+## Make
+
+Refers to the manufacturer and model of the asset. This defines the abstraction of the collection of particular logics needed for connecting to the asset’s data source.
+
+### **All makes**
+
+These fields are shared by all makes. Fields marked with \* are always present.
+
+| **Property**      | **Type**              | **Description**                                                                                | **Example value**                                                                          |
+| ----------------- | --------------------- | ---------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
+| `object`\*        | `object: make`        | Always "make"                                                                                  | `"make"`                                                                                   |
+| `id`\*            | `string`(UUID)        | Unique identifier for this make.                                                               | `"mke_ba3eb8ca-be65-44d1-8997-762c1993add9"`                                               |
+| `type`\*          | `string`(Enum)        | Type of the asset. Possible values are : `"METER"` , `"SOLAR INVERTER"` , `"BATTERY"` , `"EV"` | `"METER"`                                                                                  |
+| `createdAt`\*     | `datetime`            | datetime of creation                                                                           | `2024-08-12T02:12:33.231Z`                                                                 |
+| `updatedAt`\*     | `datetime`            | datetime of update                                                                             | `2024-08-12T03:12:33.231Z`                                                                 |
+| `brand`\*         | `string`              | Make’s brand                                                                                   | `"ACME inc."`                                                                              |
+| `model`\*         | `string`              | Make’s model                                                                                   | `"smart meter A012345"`                                                                    |
+| `version`\*       | `string`              | Make’s version                                                                                 | `"1.1.1"`                                                                                  |
+| `integrations` \* | `array:string` (UUID) | Make’s associated integrations                                                                 | `["int_6dffa5c7-1e08-4dce-86bd-a203406a89f6", "int_7255dfaf-3000-4004-bbc7-4aa50eba6406"]` |
+| `metadata`\*      | `string`              | Make’s metadata"                                                                               | `"{'key':'value', ...,}"`                                                                  |
+
+### Example
+
+```json
+{
+  "type": "make",
+  "make": {
+    "id": "mke_ba3eb8ca-be65-44d1-8997-762c1993add9",
+    "createdAt": "2024-08-12T02:12:33.231Z",
+    "updatedAt": "2024-08-12T03:12:33.231Z",
+    "type": "METER",
+    "brand": "ACME inc.",
+    "model": "smart meter",
+    "version": "1.1.1",
+    "integrations": [
+      "int_6dffa5c7-1e08-4dce-86bd-a203406a89f6",
+      "int_7255dfaf-3000-4004-bbc7-4aa50eba6406"
+    ],
+    "metadata": "{'key':'value', ...,}"
+  }
+}
+```
+
+## Integration
+
+Refers to the Integration associated with the make. This entity specifies the protocol and characteristics of the way the connection to the data source is established.
+
+### **All integrations**
+
+These fields are shared by all schemas. Fields marked with \* are always present.
+
+| **Property**  | **Type**        | **Description**                                                                                                                                                                                                                                                                                                                                                                                       | **Example value**                                                                                                                                                   |
+| ------------- | --------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `object`\*    | `object:schema` | Always "schema"                                                                                                                                                                                                                                                                                                                                                                                       | `"schema"`                                                                                                                                                          |
+| `id`\*        | `string`(UUID)  | unique identifier for this make.                                                                                                                                                                                                                                                                                                                                                                      | `"int_6dffa5c7-1e08-4dce-86bd-a203406a89f6"`                                                                                                                        |
+| `createdAt`\* | `datetime`      | datetime of creation                                                                                                                                                                                                                                                                                                                                                                                  | `2024-08-12T02:12:33.231Z`                                                                                                                                          |
+| `updatedAt`\* | `datetime`      | datetime of update                                                                                                                                                                                                                                                                                                                                                                                    | `2024-08-12T03:12:33.231Z`                                                                                                                                          |
+| `name`\*      | `string`        | name of the integration                                                                                                                                                                                                                                                                                                                                                                               | `"smart meter v1.1.1 API integration"`                                                                                                                              |
+| `protocol`\*  | `string` (Enum) | communications protocol used by the connection: `HTTP`, `Modbus`, `BACnet`, `MQTT`, `websocket` , `Query`                                                                                                                                                                                                                                                                                             | `HTTP`                                                                                                                                                              |
+| `type` \*     | `string` (Enum) | type of connection established by the integration: `pull` or `push`                                                                                                                                                                                                                                                                                                                                   | `pull`                                                                                                                                                              |
+| `specs`\*     | `array: specs`  | supported specifications for **granularity**, which is the resolution of each data point, **range**, which is the maximum size of the time window of data that can be retrieved for said granularity, **schedule**, which is the possible schedules of invocation, defined as a cron expression, and **shift**, which is a boolean that describes if time shifting is supported ( e.g. 1m, 5m, etc.). | `[{ "granularity": "1m", "range": "1mo", "schedule": "* * * * *", "shift": true }, {"granularity": "5m", "range": "1mo", "schedule" : "* * * * *", "shift": true}]` |
+| `metadata`\*  | `string`        | Integration’s metadata                                                                                                                                                                                                                                                                                                                                                                                | `"{'key':'value', ...,}"`                                                                                                                                           |
+
+### Example
+
+```json
+{
+  "type": "integration",
+  "schema": {
+    "createdAt": "2024-08-12T02:12:33.231Z",
+    "updatedAt": "2024-08-12T03:12:33.231Z",
+    "id": "int_6dffa5c7-1e08-4dce-86bd-a203406a89f6",
+    "name": "smart meter v1.1.1 API integration",
+    "protocol": "HTTP",
+    "type": "pull",
+    "specs": [
+      [
+        {
+          "granularity": "1m",
+          "range": "1mo",
+          "schedule": "* * * * *",
+          "shift": true
+        },
+        {
+          "granularity": "5m",
+          "range": "1mo",
+          "schedule": "* * * * *",
+          "shift": true
+        }
+      ]
+    ],
+    "metadata": "{'key':'value', ...,}"
+  }
+}
+```
+
+## Metrics
+
+Refers to the monitored variables and the way they are processed from the asset’s data source. This defines the abstraction of the particular logic needed for ingesting data from the asset’s data source.
+
+### **All metrics**
+
+These fields are shared by all metrics. Fields marked with \* are always present.
+
+| **Property**   | **Type**             | **Description**                                                                     | **Example value**                                                                          |
+| -------------- | -------------------- | ----------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
+| `object`\*     | `object:metric`      | Always "metric"                                                                     | `"metric"`                                                                                 |
+| `id`\*         | `string`(UUID)       | Unique identifier for this metric.                                                  | `"mtc_ebde8fde-cbe4-43a8-af77-91498a0f8c10"`                                               |
+| `createdAt`\*  | `datetime`           | datetime of creation                                                                | `2024-08-12T02:12:33.231Z`                                                                 |
+| `updatedAt`\*  | `datetime`           | datetime of update                                                                  | `2024-08-12T03:12:33.231Z`                                                                 |
+| `processes` \* | `array:string`(UUID) | ids of the processes associated to the metric                                       | `["prc_1447e4ad-4370-4162-80e1-e52098bcb1ed", "prc_ea4f4dbd-a5f9-445d-88f8-9640cfdd0e7a"]` |
+| `name` \*      | `string`             | Descriptor of the metric to be ingested                                             | `“Powerplant Demand”`                                                                      |
+| `variable` \*  | `string`(Enum)       | Type of [physical variable](https://www.iso.org/standard/76921.html) being observed | `“demand”`                                                                                 |
+| `units`\*      | `string`(Enum)       | [physical units](https://ewh.ieee.org/soc/ias/pub-dept/abbreviation.pdf)            | `“W”`                                                                                      |
+| `type` \*      | `string`(Enum)       | Data Type for the associated metric. `STRING`, `NUMBER`, or, `BOOLEAN`.             | `“NUMBER”`                                                                                 |
+| `metadata`\*   | `string`             | Metric’s metadata"                                                                  | `"{'key':'value', ...,}"`                                                                  |
+
+### Example
+
+```json
+{
+  "type": "metric",
+  "metric": {
+    "createdAt": "2024-08-12T02:12:33.231Z",
+    "updatedAt": "2024-08-12T03:12:33.231Z",
+    "id": "mtc_ebde8fde-cbe4-43a8-af77-91498a0f8c10",
+    "processes": [
+      "prc_1447e4ad-4370-4162-80e1-e52098bcb1ed",
+      "prc_ea4f4dbd-a5f9-445d-88f8-9640cfdd0e7a"
+    ],
+    "name": "Assembly line 1 demand",
+    "variable": "power",
+    "units": "W",
+    "type": "NUMBER",
+    "metadata": "{'key':'value', ...,}"
+  }
+}
+```
+
+## Process
+
+Refers to how the metric is to be processed and stored by the ingestion logic. The way a metric is to be extracted/calulated from an integration
+
+### All processes
+
+These fields are shared by all processes. Fields marked with \* are always present.
+
+| **Property**     | **Type**         | **Description**                                                                                     | **Example value**                            |
+| ---------------- | ---------------- | --------------------------------------------------------------------------------------------------- | -------------------------------------------- |
+| `object`\*       | `object:process` | Always "process"                                                                                    | `"process"`                                  |
+| `id`\*           | `string`(UUID)   | Unique identifier for this process.                                                                 | `"prc_1447e4ad-4370-4162-80e1-e52098bcb1ed"` |
+| `createdAt`      | `datetime`       | datetime of creation.                                                                               | `2024-08-12T02:12:33.231Z`                   |
+| `updatedAt`      | `datetime`       | datetime of update.                                                                                 | `2024-08-12T03:12:33.231Z`                   |
+| `integration` \* | `string` (UUID)  | id associated with the integration to be used for the process.                                      | `"int_6dffa5c7-1e08-4dce-86bd-a203406a89f6"` |
+| `metric` \*      | `string` (UUID)  | id associated with the metric that is to be created by the process.                                 | `"mtc_ebde8fde-cbe4-43a8-af77-91498a0f8c10"` |
+| `formula`\*      | `string`         | A representation of the operations to be performed to obtain the value given the reference `keys` . | `"[NODE 1 A] + [NODE 1 B]"`                  |
+| `keys`\*         | `array:string`   | The keys of the data source from which values are to be retrieved.                                  | `["NODE 1 A", "NODE 1 B"]`                   |
+| `metadata`\*     | `string`         | process’s metadata"                                                                                 | `"{'key':'value', ...,}"`                    |
+
+### Example
+
+```json
+{
+  "type": "process",
+  "process": {
+    "id": "prc_1447e4ad-4370-4162-80e1-e52098bcb1ed",
+    "createdAt": "2024-08-12T02:12:33.231Z",
+    "updatedAt": "2024-08-12T03:12:33.231Z",
+    "integration": "int_6dffa5c7-1e08-4dce-86bd-a203406a89f6",
+    "metric": "mtc_ebde8fde-cbe4-43a8-af77-91498a0f8c10",
+    "formula": "[NODE 1 A] + [NODE 1 B]",
+    "keys": ["NODE 1 A", "NODE 1 B"],
+    "metadata": "{'key':'value', ...,}"
+  }
+}
+```
+
+## Job
+
+Refers to an instance of execution of a process, with a defined granularity and time window.
+
+### **All jobs**
+
+These fields are shared by all jobs. Fields marked with \* are always present.
+
+| **Property**     | **Type**        | **Description**                                                                                                                               | **Example value**                            |
+| ---------------- | --------------- | --------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------- |
+| `object`\*       | `object:job`    | Always "job"                                                                                                                                  | `"job"`                                      |
+| `id`\*           | `string`(UUID)  | Unique identifier for the associated metric.                                                                                                  | `"job_ed6ea71e-5acd-4eec-af3d-8cc1c36ecc6d"` |
+| `createdAt` \*   | `datetime`      | datetime of creation.                                                                                                                         | `2024-08-12T02:12:33.231Z`                   |
+| `updatedAt` \*   | `datetime`      | datetime of update.                                                                                                                           | `2024-08-12T03:12:33.231Z`                   |
+| `process`\*      | `string`(UUID)  | process associated with the job                                                                                                               | `"prc_1447e4ad-4370-4162-80e1-e52098bcb1ed"` |
+| `startTs`\*      | `number`        | start of time window for data retrieval specified for each invocation of the process, specified as Unix epoch timestamp.                      | `1727220000`                                 |
+| `endTs`\*        | `number`        | end of time window for data retrieval specified for each invocation of the process, specified as Unix epoch timestamp.                        | `1727220785`                                 |
+| `shift`\*        | `string`        | shift in time for data retrieval specified for each invocation of the process, specified as a time interval, default 0. e.g. `1m`, `2m`, etc. | `"0"`                                        |
+| `granularity` \* | `string`        | granularity for data retrieval specified for each invocation of the process, specified as a time interval                                     | `"5m"`                                       |
+| `status` \*      | `string` (Enum) | status of job execution: `success`, `queued`, `canceled`, `in progress`, `fail`.                                                              | `"success"`                                  |
+| `metadata`\*     | `string`        | job ’s metadata                                                                                                                               | `"{'key':'value', ...,}"`                    |
+
+### Example
+
+```json
+{
+  "type": "job",
+  "job": {
+    "id": "job_ed6ea71e-5acd-4eec-af3d-8cc1c36ecc6d",
+    "createdAt": "2024-08-12T02:12:33.231Z",
+    "updatedAt": "2024-08-12T03:12:33.231Z",
+    "process": "prc_1447e4ad-4370-4162-80e1-e52098bcb1ed",
+    "startTs": "1727220000",
+    "endTs": "1727220785",
+    "shift": "0",
+    "granularity": "5m",
+    "status": "success",
+    "metadata": "{'key':'value', ...,}"
+  }
+}
+```
+
+## Job Schedule
+
+Refers to a schedule for job creation and execution.
+
+### **All job schedules**
+
+These fields are shared by all job schedules. Fields marked with \* are always present.
+
+| **Property**     | **Type**          | **Description**                                                                                                                           | **Example value**                            |
+| ---------------- | ----------------- | ----------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------- |
+| `object`\*       | `object:schedule` | Always "schedule"                                                                                                                         | `"schedule"`                                 |
+| `id`\*           | `string`(UUID)    | Unique identifier for the associated metric.                                                                                              | `"sch_3fd973a8-b1d3-4cd2-9487-db3e60ef3e96"` |
+| `createdAt` \*   | `datetime`        | datetime of creation.                                                                                                                     | `2024-08-12T02:12:33.231Z`                   |
+| `updatedAt` \*   | `datetime`        | datetime of update.                                                                                                                       | `2024-08-12T03:12:33.231Z`                   |
+| `process`\*      | `string`(UUID)    | process associated with the job                                                                                                           | `"prc_1447e4ad-4370-4162-80e1-e52098bcb1ed"` |
+| `cron`\*         | `string`          | cron expression for the job schedule, that is , the actual schedule in which a job will be created.                                       | `"0 0 * * *"`                                |
+| `range`\*        | `number`          | time interval for amount of data to be retrieved by the job.                                                                              | `"1d"`                                       |
+| `shift`\*        | `string`          | shift in time for data retrieval specified for each invocation of the job, specified as a time interval, default 0. e.g. `1m`, `2m`, etc. | `"0"`                                        |
+| `granularity` \* | `string`          | granularity for data retrieval specified for each invocation of the process, specified as a time interval                                 | `"5m"`                                       |
+| `metadata`\*     | `string`          | process’s metadata"                                                                                                                       | `"{'key':'value', ...,}"`                    |
+
+### Example
+
+```json
+{
+  "type": "schedule",
+  "schedule": {
+    "id": "sch_3fd973a8-b1d3-4cd2-9487-db3e60ef3e96",
+    "createdAt": "2024-08-12T02:12:33.231Z",
+    "updatedAt": "2024-08-12T03:12:33.231Z",
+    "process": "prc_1447e4ad-4370-4162-80e1-e52098bcb1ed",
+    "cron": "0 0 * * *",
+    "range": "1d",
+    "shift": "0",
+    "granularity": "5m",
+    "metadata": "{'key':'value', ...,}"
+  }
+}
+```
+
+## Metric Record
+
+Refers to a data point of a metric.
+
+### **All metric records**
+
+These fields are shared by all metrics. Fields marked with \* are always present.
+
+| **Property** | **Type**              | **Description**                                                        | **Example value**                            |
+| ------------ | --------------------- | ---------------------------------------------------------------------- | -------------------------------------------- |
+| `object`\*   | `object:metricRecord` | Always "metricRecord"                                                  | `"metricRecord"`                             |
+| `id`\*       | `string`(UUID)        | Unique identifier for the associated metric.                           | `"mtc_ebde8fde-cbe4-43a8-af77-91498a0f8c10"` |
+| `createdAt`  | `datetime`            | datetime of creation.                                                  | `2024-08-12T02:12:33.231Z`                   |
+| `updatedAt`  | `datetime`            | datetime of update.                                                    | `2024-08-12T03:12:33.231Z`                   |
+| `ts`\*       | `number`              | datetime associated with metric record, expressed as an Unix timestamp | `1727220785`                                 |
+| `value`\*    | `string`              | value associated with metric record.                                   | `"42"`                                       |
+
+### Example
+
+```json
+{
+  "type": "metricRecord",
+  "metricRecord": {
+    "createdAt": "2024-08-12T02:12:33.231Z",
+    "updatedAt": "2024-08-12T03:12:33.231Z",
+    "ts": "1727220785",
+    "id": "mtc_ebde8fde-cbe4-43a8-af77-91498a0f8c10",
+    "value": "42"
+  }
+}
+```
+
+## Units and Variables reference
+
+| **Category**                              | **Physical Variable**                    | **Unit**                  | **Unit Symbol** |
+| ----------------------------------------- | ---------------------------------------- | ------------------------- | --------------- |
+| **Base SI Units**                         | Length                                   | meter                     | m               |
+|                                           | Mass                                     | kilogram                  | kg              |
+|                                           | Time                                     | second                    | s               |
+|                                           | Electric current                         | ampere                    | A               |
+|                                           | Thermodynamic temperature                | kelvin                    | K               |
+|                                           | Amount of substance                      | mole                      | mol             |
+|                                           | Luminous intensity                       | candela                   | cd              |
+| **Derived SI Units**                      | **Mechanical**                           |                           |                 |
+|                                           | Area                                     | square meter              | m²              |
+|                                           | Volume                                   | cubic meter               | m³              |
+|                                           | Velocity                                 | meter per second          | m/s             |
+|                                           | Acceleration                             | meter per second squared  | m/s²            |
+|                                           | Wave number                              | reciprocal meter          | m⁻¹             |
+|                                           | Mass density                             | kilogram per cubic meter  | kg/m³           |
+|                                           | Specific volume                          | cubic meter per kilogram  | m³/kg           |
+|                                           | Current density                          | ampere per square meter   | A/m²            |
+|                                           | Magnetic field strength                  | ampere per meter          | A/m             |
+|                                           | Concentration                            | mole per cubic meter      | mol/m³          |
+|                                           | Luminance                                | candela per square meter  | cd/m²           |
+|                                           | Force                                    | newton                    | N               |
+|                                           | Pressure, stress                         | pascal                    | Pa              |
+|                                           | Energy, work, heat                       | joule                     | J               |
+|                                           | Power, radiant flux                      | watt                      | W               |
+|                                           | Moment of force                          | newton meter              | N·m             |
+|                                           | Surface tension                          | newton per meter          | N/m             |
+|                                           | Angular velocity                         | radian per second         | rad/s           |
+|                                           | Angular acceleration                     | radian per second squared | rad/s²          |
+|                                           | Dynamic viscosity                        | pascal second             | Pa·s            |
+|                                           | Kinematic viscosity                      | square meter per second   | m²/s            |
+|                                           | **Thermodynamic**                        |                           |                 |
+|                                           | Temperature (Celsius scale)              | degree Celsius            | °C              |
+|                                           | Heat capacity, entropy                   | joule per kelvin          | J/K             |
+|                                           | Specific heat capacity, specific entropy | joule per kilogram kelvin | J/(kg·K)        |
+|                                           | Specific energy                          | joule per kilogram        | J/kg            |
+|                                           | Thermal conductivity                     | watt per meter kelvin     | W/(m·K)         |
+|                                           | **Electromagnetic**                      |                           |                 |
+|                                           | Electric charge                          | coulomb                   | C               |
+|                                           | Electric potential difference            | volt                      | V               |
+|                                           | Capacitance                              | farad                     | F               |
+|                                           | Electric resistance                      | ohm                       | Ω               |
+|                                           | Electric conductance                     | siemens                   | S               |
+|                                           | Magnetic flux                            | weber                     | Wb              |
+|                                           | Magnetic flux density                    | tesla                     | T               |
+|                                           | Inductance                               | henry                     | H               |
+|                                           | Electric field strength                  | volt per meter            | V/m             |
+|                                           | Permittivity                             | farad per meter           | F/m             |
+|                                           | Permeability                             | henry per meter           | H/m             |
+|                                           | **Radiation and Radioactivity**          |                           |                 |
+|                                           | Absorbed dose                            | gray                      | Gy              |
+|                                           | Dose equivalent                          | sievert                   | Sv              |
+|                                           | Activity (of a radionuclide)             | becquerel                 | Bq              |
+|                                           | **Frequency and Rotation**               |                           |                 |
+|                                           | Frequency                                | hertz                     | Hz              |
+|                                           | Rotational speed                         | revolutions per minute    | rpm             |
+|                                           | **Optics**                               |                           |                 |
+|                                           | Refractive index                         | dimensionless             |                 |
+|                                           | Wavelength                               | meter or nanometer        | m/nm            |
+|                                           | **Photometry**                           |                           |                 |
+|                                           | Luminous flux                            | lumen                     | lm              |
+|                                           | Illuminance                              | lux                       | lx              |
+|                                           | **Chemistry**                            |                           |                 |
+|                                           | Catalytic activity                       | katal                     | kat             |
+|                                           | **Dimensionless Units**                  |                           |                 |
+|                                           | Plane angle                              | radian                    | rad             |
+|                                           | Solid angle                              | steradian                 | sr              |
+| **Non-SI Units Accepted for Use with SI** | Time                                     | minute, hour, day         | min, h, d       |
+|                                           | Plane angle                              | degree, minute, second    | °, ′, ″         |
+|                                           | Volume                                   | liter                     | L or l          |
+|                                           | Mass                                     | tonne                     | t               |
+|                                           | Energy                                   | electronvolt              | eV              |
+|                                           | Pressure                                 | bar                       | bar             |
